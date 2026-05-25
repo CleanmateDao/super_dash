@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/audio/audio.dart';
 import 'package:cleanmate_rush/game/game.dart';
 import 'package:cleanmate_rush/game_intro/game_intro.dart';
@@ -12,6 +15,7 @@ class Game extends StatelessWidget {
 
   static PageRoute<void> route() {
     return PageRouteBuilder(
+      settings: const RouteSettings(name: RushAnalyticsScreen.game),
       pageBuilder: (_, __, ___) => const Game(),
     );
   }
@@ -25,17 +29,41 @@ class Game extends StatelessWidget {
   }
 }
 
-void _showGameEndScreen(BuildContext context, double xp) {
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    if (!context.mounted) {
-      return;
-    }
-    Navigator.of(context).push(ScorePage.route(xp: xp));
-  });
+class GameView extends StatefulWidget {
+  const GameView({super.key});
+
+  @override
+  State<GameView> createState() => _GameViewState();
 }
 
-class GameView extends StatelessWidget {
-  const GameView({super.key});
+class _GameViewState extends State<GameView> {
+  CleanmateRushGame? _game;
+
+  void _showGameEndScreen(double xp) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      final analytics = context.read<RushAnalytics>();
+      final gameState = context.read<GameBloc>().state;
+      unawaited(
+        analytics.logRunCompleted(
+          xp: xp,
+          level: gameState.currentLevel,
+          section: gameState.currentSection,
+        ),
+      );
+      Navigator.of(context)
+          .push<bool>(ScorePage.route(xp: xp))
+          .then((playAgain) {
+        if (!mounted || playAgain != true) {
+          return;
+        }
+        unawaited(analytics.logPlayAgain(source: 'score_flow'));
+        unawaited(_game?.restartRun());
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,11 +74,17 @@ class GameView extends StatelessWidget {
           GameWidget.controlled(
             loadingBuilder: (context) => const GameBackground(),
             backgroundBuilder: (context) => const GameBackground(),
-            gameFactory: () => CleanmateRushGame(
-              gameBloc: context.read<GameBloc>(),
-              audioController: context.read<AudioController>(),
-              onRunEnded: (xp) => _showGameEndScreen(context, xp),
-            ),
+            gameFactory: () {
+              final game = CleanmateRushGame(
+                gameBloc: context.read<GameBloc>(),
+                audioController: context.read<AudioController>(),
+                rushAnalytics: context.read<RushAnalytics>(),
+                onRunEnded: _showGameEndScreen,
+              );
+              _game = game;
+              unawaited(context.read<RushAnalytics>().logGameRunStarted());
+              return game;
+            },
             overlayBuilderMap: {
               'tapToJump': (context, game) => const TapToJumpOverlay(),
             },

@@ -1,15 +1,18 @@
+import 'dart:async';
+
 import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/game/game.dart';
 import 'package:cleanmate_rush/gen/assets.gen.dart';
 import 'package:cleanmate_rush/l10n/l10n.dart';
 import 'package:cleanmate_rush/leaderboard/bloc/leaderboard_bloc.dart';
 import 'package:cleanmate_rush/score/score.dart';
 import 'package:cleanmate_rush/user_identity/user_identity.dart';
+import 'package:cleanmate_rush/widgets/b3tr_icon.dart';
 import 'package:cleanmate_rush/widgets/xp_icon.dart';
 import 'package:flame/cache.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flame/widgets.dart';
-import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leaderboard_repository/leaderboard_repository.dart';
@@ -34,6 +37,7 @@ class LeaderboardPage extends StatelessWidget {
     LeaderboardStep step = LeaderboardStep.gameIntro,
   ]) {
     return PageRouteBuilder(
+      settings: const RouteSettings(name: RushAnalyticsScreen.leaderboard),
       pageBuilder: (_, __, ___) => LeaderboardPage(step: step),
     );
   }
@@ -101,7 +105,16 @@ class LeaderboardView extends StatelessWidget {
                         size: 16,
                         color: tokens.primaryForeground,
                       ),
-                      onPressed: context.flow<ScoreState>().complete,
+                      onPressed: () {
+                        unawaited(
+                          context.read<RushAnalytics>().logPlayAgain(
+                                source: 'leaderboard',
+                              ),
+                        );
+                        context
+                            .read<ScoreBloc>()
+                            .add(const ScorePlayAgainRequested());
+                      },
                       gradient: tokens.blueGradient,
                     ),
                 },
@@ -245,7 +258,7 @@ class LeaderboardContent extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'RANKINGS',
-                    style: theme.textTheme.labelLarge?.copyWith(
+                    style: theme.textTheme.labelMedium?.copyWith(
                       color: tokens.mutedForeground,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.2,
@@ -320,7 +333,7 @@ class _LeaderboardPeriodHeader extends StatelessWidget {
                 children: [
                   Text(
                     'This week',
-                    style: textTheme.titleSmall?.copyWith(
+                    style: textTheme.bodyMedium?.copyWith(
                       color: tokens.foreground,
                       fontWeight: FontWeight.w800,
                     ),
@@ -391,8 +404,8 @@ class _LeaderboardEntries extends StatelessWidget {
                 width: 32,
                 child: Text(
                   '${entry.rank ?? index + 1}',
-                  style: textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
+                  style: textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -406,16 +419,16 @@ class _LeaderboardEntries extends StatelessWidget {
                     ? Text(
                         entry.playerInitials,
                         overflow: TextOverflow.ellipsis,
-                        style: textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
+                        style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
                         ),
                       )
                     : WalletUsernameText(
                         walletAddress: walletAddress,
                         profileName: entry.profileName,
                         overflow: TextOverflow.ellipsis,
-                        style: textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
+                        style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
               ),
@@ -457,8 +470,8 @@ class _LeaderboardEntryScore extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               entry.weekXp.toStringAsFixed(2),
-              style: textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w900,
+              style: textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(width: 3),
@@ -477,7 +490,7 @@ class _LeaderboardEntryScore extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              const XpIcon(size: 12),
+              const B3trIcon(),
             ],
           ),
         ],

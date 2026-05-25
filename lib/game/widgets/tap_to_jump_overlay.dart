@@ -24,7 +24,7 @@ class TapToJumpOverlay extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
               l10n.tapToStart,
-              style: textTheme.titleLarge?.copyWith(
+              style: textTheme.bodyMedium?.copyWith(
                 color: tokens.foreground,
                 fontWeight: FontWeight.w700,
               ),

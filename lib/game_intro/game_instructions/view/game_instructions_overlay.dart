@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/game_intro/game_intro.dart';
 import 'package:cleanmate_rush/gen/assets.gen.dart';
 import 'package:cleanmate_rush/l10n/l10n.dart';
@@ -28,6 +29,7 @@ class GameInstructionsOverlay extends StatelessWidget {
 
   static PageRoute<void> route() {
     return HeroDialogRoute(
+      settings: const RouteSettings(name: RushAnalyticsScreen.howToPlay),
       builder: (context) => BackdropFilter(
         filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
         child: const ResponsiveDialogFrame(
@@ -180,7 +182,7 @@ class _CardContent extends StatelessWidget {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: theme.textTheme.titleLarge?.copyWith(
+                style: theme.textTheme.titleMedium?.copyWith(
                   color: tokens.foreground,
                   fontWeight: FontWeight.w600,
                 ),

@@ -10,3 +10,7 @@ sealed class ScoreEvent extends Equatable {
 final class ScoreLeaderboardRequested extends ScoreEvent {
   const ScoreLeaderboardRequested();
 }
+
+final class ScorePlayAgainRequested extends ScoreEvent {
+  const ScorePlayAgainRequested();
+}

@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/constants/constants.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cleanmate_rush/game_intro/game_intro.dart';
 import 'package:cleanmate_rush/l10n/l10n.dart';
 import 'package:flutter/gestures.dart';
@@ -48,8 +52,14 @@ class BottomBar extends StatelessWidget {
                           TextSpan(
                             text: l10n.privacyPolicy,
                             recognizer: TapGestureRecognizer()
-                              ..onTap =
-                                  () => launchUrlString(Urls.privacyPolicy),
+                              ..onTap = () {
+                                unawaited(
+                                  context.read<RushAnalytics>().logExternalLinkTapped(
+                                        link: 'privacy_policy',
+                                      ),
+                                );
+                                launchUrlString(Urls.privacyPolicy);
+                              },
                           ),
                           TextSpan(
                             text: '  |  ',
@@ -61,8 +71,14 @@ class BottomBar extends StatelessWidget {
                           TextSpan(
                             text: l10n.termsOfService,
                             recognizer: TapGestureRecognizer()
-                              ..onTap =
-                                  () => launchUrlString(Urls.termsOfService),
+                              ..onTap = () {
+                                unawaited(
+                                  context.read<RushAnalytics>().logExternalLinkTapped(
+                                        link: 'terms_of_service',
+                                      ),
+                                );
+                                launchUrlString(Urls.termsOfService);
+                              },
                           ),
                         ],
                       ),

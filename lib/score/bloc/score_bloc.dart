@@ -9,6 +9,7 @@ class ScoreBloc extends Bloc<ScoreEvent, ScoreState> {
     required this.xp,
   }) : super(const ScoreState()) {
     on<ScoreLeaderboardRequested>(_onScoreLeaderboardRequested);
+    on<ScorePlayAgainRequested>(_onScorePlayAgainRequested);
   }
 
   final double xp;
@@ -22,5 +23,12 @@ class ScoreBloc extends Bloc<ScoreEvent, ScoreState> {
         status: ScoreStatus.leaderboard,
       ),
     );
+  }
+
+  void _onScorePlayAgainRequested(
+    ScorePlayAgainRequested event,
+    Emitter<ScoreState> emit,
+  ) {
+    emit(state.copyWith(playAgainRequested: true));
   }
 }

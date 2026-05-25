@@ -11,15 +11,21 @@ class LeaderboardRepository {
   LeaderboardRepository({
     http.Client? httpClient,
     Uri? weeklyLeaderboardUri,
+    NetworkCache? cache,
+    Duration weeklyLeaderboardCacheTtl = const Duration(seconds: 60),
   })  : _httpClient = httpClient ?? http.Client(),
         _weeklyLeaderboardUri = weeklyLeaderboardUri ??
             Uri.https(
               'api.cleanmatedao.com',
               '/xp/leaderboard/weekly',
-            );
+            ),
+        _cache = cache,
+        _weeklyLeaderboardCacheTtl = weeklyLeaderboardCacheTtl;
 
   final http.Client _httpClient;
   final Uri _weeklyLeaderboardUri;
+  final NetworkCache? _cache;
+  final Duration _weeklyLeaderboardCacheTtl;
 
   /// Acquires weekly [LeaderboardEntryData]s for the leaderboard screen.
   Future<List<LeaderboardEntryData>> fetchTop10Leaderboard() async {
@@ -31,6 +37,33 @@ class LeaderboardRepository {
     int weeksAgo = 0,
     int page = 1,
     int limit = 20,
+    bool forceRefresh = false,
+  }) async {
+    final cache = _cache;
+    if (cache == null) {
+      return _fetchWeeklyLeaderboard(
+        weeksAgo: weeksAgo,
+        page: page,
+        limit: limit,
+      );
+    }
+
+    return cache.getOrFetch(
+      key: 'leaderboard:weekly:$weeksAgo:$page:$limit',
+      ttl: _weeklyLeaderboardCacheTtl,
+      forceRefresh: forceRefresh,
+      fetch: () => _fetchWeeklyLeaderboard(
+        weeksAgo: weeksAgo,
+        page: page,
+        limit: limit,
+      ),
+    );
+  }
+
+  Future<List<LeaderboardEntryData>> _fetchWeeklyLeaderboard({
+    required int weeksAgo,
+    required int page,
+    required int limit,
   }) async {
     try {
       final response = await _httpClient.get(

@@ -1,4 +1,5 @@
 import 'package:authentication_repository/authentication_repository.dart';
+import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/app/app.dart';
 import 'package:cleanmate_rush/audio/audio.dart';
 import 'package:cleanmate_rush/game_intro/game_intro.dart';
@@ -50,6 +51,8 @@ void main() {
           shareController: shareController,
           authenticationRepository: authenticationRepository,
           leaderboardRepository: leaderboardRepository,
+          networkCache: NetworkCache(),
+          rushAnalytics: RushAnalytics.noop(),
         ),
       );
       expect(find.byType(GameIntroPage), findsOneWidget);

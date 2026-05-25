@@ -28,12 +28,13 @@ class XpLabel extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           child: Row(
             children: [
-              const XpIcon(size: 40),
-              const SizedBox(width: 10),
+              const XpIcon(size: 16),
+              const SizedBox(width: 8),
               Text(
                 formatXp(xp),
-                style: textTheme.titleLarge?.copyWith(
+                style: textTheme.bodyMedium?.copyWith(
                   color: tokens.foreground,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],

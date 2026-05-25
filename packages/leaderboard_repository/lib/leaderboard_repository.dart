@@ -3,3 +3,4 @@ library leaderboard_repository;
 
 export 'src/leaderboard_repository.dart';
 export 'src/models/models.dart';
+export 'src/network_cache.dart';

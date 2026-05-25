@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/game/game.dart';
 import 'package:cleanmate_rush/game_intro/game_intro.dart';
 import 'package:cleanmate_rush/user_identity/user_identity.dart';
@@ -20,6 +21,7 @@ class LocationsPage extends StatefulWidget {
     required String walletAddress,
   }) {
     return PageRouteBuilder(
+      settings: const RouteSettings(name: RushAnalyticsScreen.locations),
       pageBuilder: (_, __, ___) => LocationsPage(walletAddress: walletAddress),
     );
   }
@@ -179,7 +181,15 @@ class _LocationsView extends StatelessWidget {
                       requirement: LocationRequirement.none,
                       unlocked: true,
                       image: const AssetImage('assets/images/antarctica.png'),
-                      onTap: () => Navigator.of(context).push(Game.route()),
+                      onTap: () {
+                        unawaited(
+                          context.read<RushAnalytics>().logLocationSelected(
+                                locationName: 'Antarctica',
+                                unlocked: true,
+                              ),
+                        );
+                        Navigator.of(context).push(Game.route());
+                      },
                     ),
                     const _LocationCard(
                       name: 'Africa',
@@ -249,6 +259,7 @@ class _PlayerTopBar extends StatelessWidget {
   final num weekXp;
 
   Future<void> _showProfileSheet(BuildContext context) {
+    unawaited(context.read<RushAnalytics>().logProfileOpened());
     return showResponsivePanel<void>(
       context: context,
       builder: (_) {
@@ -324,6 +335,7 @@ class _ProfileBottomSheet extends StatelessWidget {
   final String? profileName;
 
   Future<void> _logout(BuildContext context) async {
+    unawaited(context.read<RushAnalytics>().logLogout());
     await context.read<UserSessionRepository>().clearWalletAddress();
 
     if (!context.mounted) return;
@@ -441,7 +453,17 @@ class _LocationCard extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: unlocked ? onTap : () => _showUnlockDetails(context),
+            onTap: unlocked
+                ? onTap
+                : () {
+                    unawaited(
+                      context.read<RushAnalytics>().logLocationSelected(
+                            locationName: name,
+                            unlocked: false,
+                          ),
+                    );
+                    unawaited(_showUnlockDetails(context));
+                  },
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -509,6 +531,11 @@ class _LocationCard extends StatelessWidget {
   }
 
   Future<void> _showUnlockDetails(BuildContext context) {
+    unawaited(
+      context.read<RushAnalytics>().logScreenView(
+            RushAnalyticsScreen.locationUnlock,
+          ),
+    );
     return showResponsivePanel<void>(
       context: context,
       builder: (_) {

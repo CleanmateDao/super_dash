@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/audio/audio.dart';
 import 'package:cleanmate_rush/game/game.dart';
 import 'package:cleanmate_rush/user_session/user_session.dart';
@@ -33,9 +34,11 @@ class CleanmateRushGame extends LeapGame
   CleanmateRushGame({
     required this.gameBloc,
     required this.audioController,
+    RushAnalytics? rushAnalytics,
     this.onRunEnded,
     this.inMapTester = false,
-  }) : super(
+  })  : rushAnalytics = rushAnalytics ?? RushAnalytics.noop(),
+        super(
           tileSize: 64,
           configuration: const LeapConfiguration(
             tiled: TiledOptions(
@@ -64,6 +67,7 @@ class CleanmateRushGame extends LeapGame
 
   final GameBloc gameBloc;
   final AudioController audioController;
+  final RushAnalytics rushAnalytics;
   final void Function(double xp)? onRunEnded;
   final List<VoidCallback> _inputListener = [];
 
@@ -71,6 +75,7 @@ class CleanmateRushGame extends LeapGame
   final bool inMapTester;
 
   var _hasEndedRun = false;
+  var _loggedFirstInput = false;
 
   GameState get state => gameBloc.state;
 
@@ -99,6 +104,10 @@ class CleanmateRushGame extends LeapGame
   }
 
   void _triggerInputListeners() {
+    if (!_loggedFirstInput && !inMapTester) {
+      _loggedFirstInput = true;
+      unawaited(rushAnalytics.logFirstInput());
+    }
     for (final listener in _inputListener) {
       listener();
     }
@@ -228,40 +237,39 @@ class CleanmateRushGame extends LeapGame
     _resetEntities();
 
     if (onRunEnded == null) {
+      unawaited(restartRun());
+    }
+  }
+
+  Future<void> restartRun() async {
+    if (!_hasEndedRun) {
       return;
     }
 
-    Future<void>.delayed(
-      const Duration(seconds: 1),
-      () async {
-        if (!_hasEndedRun) {
-          return;
-        }
-        await loadWorldAndMap(
-          images: images,
-          prefix: prefix,
-          tiledMapPath: _sections.first,
-        );
-        if (isLastSection || isFirstSection) {
-          _addTreeHouseFrontLayer();
-        }
-
-        if (isFirstSection) {
-          _addTreeHouseSign();
-        }
-        final newPlayer = Player(
-          levelSize: leapMap.tiledMap.size.clone(),
-          cameraViewport: _cameraViewport,
-        );
-        await world.add(newPlayer);
-
-        await newPlayer.mounted;
-        await _addSpawners();
-        overlays.add('tapToJump');
-        resumeEngine();
-        _hasEndedRun = false;
-      },
+    await loadWorldAndMap(
+      images: images,
+      prefix: prefix,
+      tiledMapPath: _sections.first,
     );
+    if (isLastSection || isFirstSection) {
+      _addTreeHouseFrontLayer();
+    }
+
+    if (isFirstSection) {
+      _addTreeHouseSign();
+    }
+    final newPlayer = Player(
+      levelSize: leapMap.tiledMap.size.clone(),
+      cameraViewport: _cameraViewport,
+    );
+    await world.add(newPlayer);
+
+    await newPlayer.mounted;
+    await _addSpawners();
+    overlays.add('tapToJump');
+    resumeEngine();
+    _hasEndedRun = false;
+    _loggedFirstInput = false;
   }
 
   Future<void> _postGameplayXp(double xp) async {
@@ -283,10 +291,19 @@ class CleanmateRushGame extends LeapGame
         runId: _newRunId(xp),
       );
       realtimeService.notifyXpAwarded(result);
+      unawaited(rushAnalytics.logXpPosted(xp: xp));
     } on RushApiException catch (error) {
+      unawaited(
+        rushAnalytics.logXpPostFailed(
+          xp: xp,
+          statusCode: error.statusCode,
+        ),
+      );
       if (error.statusCode == 401 || error.statusCode == 403) {
         await sessionRepository.clearSession();
       }
+    } on Exception {
+      unawaited(rushAnalytics.logXpPostFailed(xp: xp));
     }
   }
 
@@ -380,6 +397,12 @@ class CleanmateRushGame extends LeapGame
     _loadNewSection();
 
     gameBloc.add(GameSectionCompleted(sectionCount: _sections.length));
+    unawaited(
+      rushAnalytics.logSectionCompleted(
+        sectionIndex: state.currentSection,
+        level: state.currentLevel,
+      ),
+    );
   }
 
   bool get isLastSection => state.currentSection == _sections.length - 1;

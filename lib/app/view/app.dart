@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:app_ui/app_ui.dart';
 import 'package:authentication_repository/authentication_repository.dart';
+import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/app_lifecycle/app_lifecycle.dart';
 import 'package:cleanmate_rush/audio/audio.dart';
 import 'package:cleanmate_rush/game_intro/game_intro.dart';
@@ -15,22 +16,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leaderboard_repository/leaderboard_repository.dart';
 
 class App extends StatelessWidget {
-  const App({
+  App({
     required this.audioController,
     required this.settingsController,
     required this.shareController,
     required this.authenticationRepository,
     required this.leaderboardRepository,
+    required this.networkCache,
+    required this.rushAnalytics,
     this.isTesting = false,
     super.key,
   });
 
   final bool isTesting;
+  final RushAnalytics rushAnalytics;
   final AudioController audioController;
   final SettingsController settingsController;
   final ShareController shareController;
   final AuthenticationRepository authenticationRepository;
   final LeaderboardRepository leaderboardRepository;
+  final NetworkCache networkCache;
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +60,16 @@ class App extends StatelessWidget {
           RepositoryProvider<AuthenticationRepository>.value(
             value: authenticationRepository..signInAnonymously(),
           ),
+          RepositoryProvider<NetworkCache>.value(
+            value: networkCache,
+          ),
           RepositoryProvider<LeaderboardRepository>.value(
             value: leaderboardRepository,
           ),
           RepositoryProvider<RushApiClient>(
-            create: (context) => RushApiClient(),
+            create: (context) => RushApiClient(
+              cache: context.read<NetworkCache>(),
+            ),
           ),
           RepositoryProvider<UserSessionRepository>.value(
             value: const UserSessionRepository(),
@@ -74,13 +84,20 @@ class App extends StatelessWidget {
               return service;
             },
           ),
+          RepositoryProvider<RushAnalytics>.value(
+            value: rushAnalytics,
+          ),
         ],
         child: MaterialApp(
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
+          navigatorObservers: [
+            RushAnalyticsNavigatorObserver(rushAnalytics),
+          ],
           builder: (context, child) => _RushSessionInvalidationListener(
+            rushAnalytics: rushAnalytics,
             child: child ?? const SizedBox.shrink(),
           ),
           home: isTesting ? const MapTesterView() : const GameIntroPage(),
@@ -91,8 +108,12 @@ class App extends StatelessWidget {
 }
 
 class _RushSessionInvalidationListener extends StatefulWidget {
-  const _RushSessionInvalidationListener({required this.child});
+  const _RushSessionInvalidationListener({
+    required this.rushAnalytics,
+    required this.child,
+  });
 
+  final RushAnalytics rushAnalytics;
   final Widget child;
 
   @override
@@ -120,9 +141,15 @@ class _RushSessionInvalidationListenerState
   }
 
   void _handleSessionChanged(RushSession? session) {
-    if (!mounted || session != null) {
+    if (!mounted) {
       return;
     }
+    if (session == null) {
+      context.read<NetworkCache>().clear();
+    } else {
+      return;
+    }
+    unawaited(widget.rushAnalytics.logSessionDisconnected());
     final navigator = Navigator.maybeOf(context);
     navigator?.popUntil((route) => route.isFirst);
     ScaffoldMessenger.maybeOf(context)?.showSnackBar(

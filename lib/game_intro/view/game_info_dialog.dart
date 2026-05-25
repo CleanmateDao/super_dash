@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/constants/constants.dart';
 import 'package:cleanmate_rush/gen/assets.gen.dart';
 import 'package:cleanmate_rush/l10n/l10n.dart';
@@ -13,6 +14,7 @@ class GameInfoDialog extends StatelessWidget {
 
   static PageRoute<void> route() {
     return HeroDialogRoute(
+      settings: const RouteSettings(name: RushAnalyticsScreen.gameInfo),
       builder: (context) => BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
         child: const ResponsiveDialogFrame(
@@ -54,7 +56,7 @@ class GameInfoDialog extends StatelessWidget {
               children: [
                 Text(
                   l10n.aboutCleanmateRush,
-                  style: textTheme.headlineSmall?.copyWith(
+                  style: textTheme.titleMedium?.copyWith(
                     color: tokens.foreground,
                     fontWeight: FontWeight.w800,
                   ),

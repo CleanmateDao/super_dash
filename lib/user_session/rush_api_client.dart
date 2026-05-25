@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:leaderboard_repository/leaderboard_repository.dart';
 
 class RushApiException implements Exception {
   const RushApiException(this.message, {this.statusCode});
@@ -84,13 +85,30 @@ class RushApiClient {
   RushApiClient({
     http.Client? httpClient,
     Uri? baseUri,
+    NetworkCache? cache,
+    Duration profileCacheTtl = const Duration(seconds: 30),
+    Duration weeklyLeaderboardCacheTtl = const Duration(seconds: 30),
   })  : _httpClient = httpClient ?? http.Client(),
-        _baseUri = baseUri ?? Uri.https('api.cleanmatedao.com');
+        _baseUri = baseUri ?? Uri.https('api.cleanmatedao.com'),
+        _cache = cache,
+        _profileCacheTtl = profileCacheTtl,
+        _weeklyLeaderboardCacheTtl = weeklyLeaderboardCacheTtl;
 
   final http.Client _httpClient;
   final Uri _baseUri;
+  final NetworkCache? _cache;
+  final Duration _profileCacheTtl;
+  final Duration _weeklyLeaderboardCacheTtl;
 
   String get socketOrigin => '${_baseUri.scheme}://${_baseUri.host}';
+
+  static String _tokenCacheScope(String token) =>
+      token.hashCode.toRadixString(16);
+
+  void _invalidateAuthenticatedCache(String token) {
+    final scope = _tokenCacheScope(token);
+    _cache?.invalidateWhere((key) => key.contains(':$scope'));
+  }
 
   Future<RushLinkResult> verifyOtp(String otp) async {
     final response = await _httpClient.post(
@@ -99,15 +117,36 @@ class RushApiClient {
       body: jsonEncode({'otp': otp}),
     );
     final data = _decodeData(response);
-    return RushLinkResult(
+    final result = RushLinkResult(
       address: data.string('address'),
       token: data.string('token'),
     );
+    _invalidateAuthenticatedCache(result.token);
+    return result;
   }
 
   Future<RushWeeklyLeaderboardSelf> fetchWeeklyLeaderboardMe(
     String token, {
     int weeksAgo = 0,
+    bool forceRefresh = false,
+  }) async {
+    final cache = _cache;
+    if (cache == null) {
+      return _fetchWeeklyLeaderboardMe(token, weeksAgo: weeksAgo);
+    }
+
+    final scope = _tokenCacheScope(token);
+    return cache.getOrFetch(
+      key: 'rush:weekly:$scope:$weeksAgo',
+      ttl: _weeklyLeaderboardCacheTtl,
+      forceRefresh: forceRefresh,
+      fetch: () => _fetchWeeklyLeaderboardMe(token, weeksAgo: weeksAgo),
+    );
+  }
+
+  Future<RushWeeklyLeaderboardSelf> _fetchWeeklyLeaderboardMe(
+    String token, {
+    required int weeksAgo,
   }) async {
     final response = await _httpClient.get(
       _uri(
@@ -135,7 +174,25 @@ class RushApiClient {
     );
   }
 
-  Future<RushProfile> fetchProfile(String token) async {
+  Future<RushProfile> fetchProfile(
+    String token, {
+    bool forceRefresh = false,
+  }) async {
+    final cache = _cache;
+    if (cache == null) {
+      return _fetchProfile(token);
+    }
+
+    final scope = _tokenCacheScope(token);
+    return cache.getOrFetch(
+      key: 'rush:profile:$scope',
+      ttl: _profileCacheTtl,
+      forceRefresh: forceRefresh,
+      fetch: () => _fetchProfile(token),
+    );
+  }
+
+  Future<RushProfile> _fetchProfile(String token) async {
     final response = await _httpClient.get(
       _uri('/rush/me'),
       headers: _jsonHeaders(token),
@@ -162,12 +219,16 @@ class RushApiClient {
       body: jsonEncode({'amount': amount, 'runId': runId}),
     );
     final data = _decodeData(response);
-    return RushXpAwardResult(
+    final result = RushXpAwardResult(
       applied: data.boolean('applied'),
       delta: data.number('delta'),
       xpTotal: data.number('xpTotal'),
       weekXp: data.number('weekXp'),
     );
+    if (result.applied) {
+      _invalidateAuthenticatedCache(token);
+    }
+    return result;
   }
 
   Map<String, String> _jsonHeaders([String? token]) => {

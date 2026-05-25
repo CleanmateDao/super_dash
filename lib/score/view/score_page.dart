@@ -1,3 +1,4 @@
+import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/score/bloc/score_bloc.dart';
 import 'package:cleanmate_rush/score/routes/routes.dart';
 import 'package:flow_builder/flow_builder.dart';
@@ -10,8 +11,9 @@ class ScorePage extends StatelessWidget {
     super.key,
   });
 
-  static PageRoute<void> route({required double xp}) {
+  static PageRoute<bool> route({required double xp}) {
     return PageRouteBuilder(
+      settings: const RouteSettings(name: RushAnalyticsScreen.score),
       pageBuilder: (_, __, ___) => ScorePage(xp: xp),
     );
   }
@@ -34,9 +36,16 @@ class ScoreView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlowBuilder<ScoreState>(
-      state: context.select((ScoreBloc bloc) => bloc.state),
-      onGeneratePages: onGenerateScorePages,
+    return BlocListener<ScoreBloc, ScoreState>(
+      listenWhen: (previous, current) =>
+          !previous.playAgainRequested && current.playAgainRequested,
+      listener: (context, state) {
+        Navigator.of(context).pop(true);
+      },
+      child: FlowBuilder<ScoreState>(
+        state: context.select((ScoreBloc bloc) => bloc.state),
+        onGeneratePages: onGenerateScorePages,
+      ),
     );
   }
 }

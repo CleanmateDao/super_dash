@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/game/game.dart';
 import 'package:cleanmate_rush/game_intro/game_intro.dart';
 import 'package:cleanmate_rush/gen/assets.gen.dart';
@@ -6,7 +9,6 @@ import 'package:cleanmate_rush/l10n/l10n.dart';
 import 'package:cleanmate_rush/score/score.dart';
 import 'package:cleanmate_rush/utils/utils.dart';
 import 'package:cleanmate_rush/widgets/xp_icon.dart';
-import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -64,7 +66,7 @@ class GameOverPage extends StatelessWidget {
                         Text(
                           l10n.gameOver,
                           textAlign: TextAlign.center,
-                          style: textTheme.headlineMedium?.copyWith(
+                          style: textTheme.titleMedium?.copyWith(
                             color: titleColor,
                             fontWeight: FontWeight.w600,
                           ),
@@ -95,6 +97,14 @@ class GameOverPage extends StatelessWidget {
                     expanded: context.isCompact,
                     label: l10n.seeTheRanking,
                     onPressed: () {
+                      unawaited(
+                        context.read<RushAnalytics>().logLeaderboardRankingTapped(),
+                      );
+                      unawaited(
+                        context.read<RushAnalytics>().logLeaderboardOpened(
+                              source: 'game_over',
+                            ),
+                      );
                       context
                           .read<ScoreBloc>()
                           .add(const ScoreLeaderboardRequested());
@@ -109,7 +119,16 @@ class GameOverPage extends StatelessWidget {
                       size: 16,
                       color: tokens.primaryForeground,
                     ),
-                    onPressed: context.flow<ScoreState>().complete,
+                    onPressed: () {
+                      unawaited(
+                        context.read<RushAnalytics>().logPlayAgain(
+                              source: 'game_over',
+                            ),
+                      );
+                      context
+                          .read<ScoreBloc>()
+                          .add(const ScorePlayAgainRequested());
+                    },
                     gradient: tokens.blueGradient,
                   ),
                   const SizedBox(height: 24),
@@ -145,13 +164,13 @@ class _XpWidget extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const XpIcon(size: 40),
+          const XpIcon(size: 24),
           const SizedBox(width: 8),
           Text(
             formatXp(xp),
-            style: textTheme.headlineMedium?.copyWith(
+            style: textTheme.bodyMedium?.copyWith(
               color: tokens.foreground,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],

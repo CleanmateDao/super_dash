@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:authentication_repository/authentication_repository.dart';
+import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/app/app.dart';
 import 'package:cleanmate_rush/audio/audio.dart';
 import 'package:cleanmate_rush/bootstrap.dart';
@@ -19,6 +20,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  final rushAnalytics = RushAnalytics();
+  unawaited(rushAnalytics.logAppOpened());
+
   final settings = SettingsController(
     persistence: LocalStorageSettingsPersistence(),
   );
@@ -30,9 +34,11 @@ void main() async {
 
   final share = ShareController(
     gameUrl: 'https://endless-runner-9481713-383737.web.app/',
+    rushAnalytics: rushAnalytics,
   );
 
-  final leaderboardRepository = LeaderboardRepository();
+  final networkCache = NetworkCache();
+  final leaderboardRepository = LeaderboardRepository(cache: networkCache);
 
   unawaited(
     bootstrap(
@@ -45,8 +51,10 @@ void main() async {
           audioController: audio,
           settingsController: settings,
           shareController: share,
+          rushAnalytics: rushAnalytics,
           authenticationRepository: authenticationRepository,
           leaderboardRepository: leaderboardRepository,
+          networkCache: networkCache,
         );
       },
     ),

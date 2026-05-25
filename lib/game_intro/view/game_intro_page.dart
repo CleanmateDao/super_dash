@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/audio/audio.dart';
 import 'package:cleanmate_rush/game_intro/game_intro.dart';
 import 'package:cleanmate_rush/gen/assets.gen.dart';
@@ -60,6 +61,9 @@ class _IntroPageState extends State<_IntroPage> {
   @override
   void initState() {
     super.initState();
+    unawaited(
+      context.read<RushAnalytics>().logScreenView(RushAnalyticsScreen.intro),
+    );
     final sessionRepository = context.read<UserSessionRepository>();
     _walletAddress = sessionRepository.readWalletAddress();
     unawaited(_loadInitialLinkedState(sessionRepository));
@@ -121,17 +125,21 @@ class _IntroPageState extends State<_IntroPage> {
   }
 
   Future<void> _onLinkPressed() async {
+    final analytics = context.read<RushAnalytics>();
+    unawaited(analytics.logWalletLinkOpened());
     final linked = await showResponsivePanel<bool>(
       context: context,
       builder: (context) => const _LinkWalletSheet(),
     );
 
     if ((linked ?? false) && mounted) {
+      unawaited(analytics.logWalletLinkSuccess());
       _refreshWalletAddress();
     }
   }
 
   void _onPlayPressed(String walletAddress) {
+    unawaited(context.read<RushAnalytics>().logPlayPressed());
     Navigator.of(context)
         .push(LocationsPage.route(walletAddress: walletAddress));
   }
@@ -242,6 +250,14 @@ class _LinkWalletSheetState extends State<_LinkWalletSheet> {
   String? _errorMessage;
 
   @override
+  void initState() {
+    super.initState();
+    unawaited(
+      context.read<RushAnalytics>().logScreenView(RushAnalyticsScreen.linkWallet),
+    );
+  }
+
+  @override
   void dispose() {
     _otpController.dispose();
     super.dispose();
@@ -269,17 +285,27 @@ class _LinkWalletSheetState extends State<_LinkWalletSheet> {
       }
     } on Exception catch (error) {
       if (mounted) {
+        final message = error is RushApiException
+            ? error.message
+            : 'Unable to link Rush. Please try again.';
+        unawaited(
+          context.read<RushAnalytics>().logWalletLinkFailed(reason: message),
+        );
         setState(() {
           _isSubmitting = false;
-          _errorMessage = error is RushApiException
-              ? error.message
-              : 'Unable to link Rush. Please try again.';
+          _errorMessage = message;
         });
       }
     }
   }
 
   Future<void> _openCleanmateApp() {
+    unawaited(context.read<RushAnalytics>().logWalletSignupTapped());
+    unawaited(
+      context.read<RushAnalytics>().logExternalLinkTapped(
+            link: 'cleanmate_app',
+          ),
+    );
     return launchUrl(Uri.parse('http://app.cleanmatedao.com/'));
   }
 
@@ -314,7 +340,7 @@ class _LinkWalletSheetState extends State<_LinkWalletSheet> {
                 children: [
                   Text(
                     'Link Cleanmate account',
-                    style: theme.textTheme.titleLarge?.copyWith(
+                    style: theme.textTheme.titleMedium?.copyWith(
                       color: tokens.foreground,
                       fontWeight: FontWeight.w800,
                     ),
