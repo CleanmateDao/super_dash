@@ -48,7 +48,7 @@ _Cleanmate Rush is web-only._
 The app can be deployed to [Amplify Hosting](https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html) as static Flutter web output (same artifact as Firebase Hosting).
 
 1. Connect the **cleanmate** repository in Amplify (uses root `amplify.yml` with `appRoot: nebula/cleanmate_rush`), or connect only this folder and use the local `amplify.yml` here.
-2. `amplify.yml` installs Flutter stable, runs `flutter build web --web-renderer canvaskit`, and publishes `build/web`.
+2. `amplify.yml` installs Flutter stable, runs `flutter build web`, and publishes `build/web`.
 3. Branch → entry point (override with env var `AMPLIFY_FLUTTER_TARGET`):
 
    | Branch | Entry point |

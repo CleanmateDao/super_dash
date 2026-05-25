@@ -10,7 +10,7 @@ frontend:
         - export PATH="${HOME}/flutter/bin:${PATH}"
         - export FLUTTER_TARGET="$(./scripts/amplify_flutter_target.sh)"
         - echo "Building Cleanmate Rush with ${FLUTTER_TARGET} (branch ${AWS_BRANCH:-unknown})"
-        - flutter build web --web-renderer canvaskit -t "${FLUTTER_TARGET}"
+        - flutter build web -t "${FLUTTER_TARGET}"
   artifacts:
     baseDirectory: build/web
     files:
