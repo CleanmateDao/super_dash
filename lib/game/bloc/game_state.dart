@@ -2,32 +2,32 @@ part of 'game_bloc.dart';
 
 class GameState extends Equatable {
   const GameState({
-    required this.score,
+    required this.xp,
     required this.currentLevel,
     required this.currentSection,
   });
 
   const GameState.initial()
-      : score = 0,
+      : xp = 0,
         currentLevel = 1,
         currentSection = 0;
 
-  final int score;
+  final double xp;
   final int currentLevel;
   final int currentSection;
 
   GameState copyWith({
-    int? score,
+    double? xp,
     int? currentLevel,
     int? currentSection,
   }) {
     return GameState(
-      score: score ?? this.score,
+      xp: xp ?? this.xp,
       currentLevel: currentLevel ?? this.currentLevel,
       currentSection: currentSection ?? this.currentSection,
     );
   }
 
   @override
-  List<Object?> get props => [score, currentLevel, currentSection];
+  List<Object?> get props => [xp, currentLevel, currentSection];
 }

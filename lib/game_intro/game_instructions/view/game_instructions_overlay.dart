@@ -1,13 +1,12 @@
 import 'dart:ui' as ui;
 
 import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/game_intro/game_intro.dart';
+import 'package:cleanmate_rush/gen/assets.gen.dart';
+import 'package:cleanmate_rush/l10n/l10n.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:super_dash/game_intro/game_intro.dart';
-import 'package:super_dash/gen/assets.gen.dart';
-import 'package:super_dash/l10n/l10n.dart';
-import 'package:super_dash/utils/utils.dart';
 
 class GameInstruction extends Equatable {
   const GameInstruction({
@@ -29,9 +28,11 @@ class GameInstructionsOverlay extends StatelessWidget {
 
   static PageRoute<void> route() {
     return HeroDialogRoute(
-      builder: (_) => BackdropFilter(
+      builder: (context) => BackdropFilter(
         filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        child: const GameInstructionsOverlay(),
+        child: const ResponsiveDialogFrame(
+          child: GameInstructionsOverlay(),
+        ),
       ),
     );
   }
@@ -57,7 +58,7 @@ class _GameInstructionsOverlayViewState
     extends State<GameInstructionsOverlayView> {
   late final PageController pageController;
 
-  List<GameInstruction> get instructions {
+  List<GameInstruction> _instructions(BuildContext context) {
     final l10n = context.l10n;
     return [
       GameInstruction(
@@ -65,7 +66,7 @@ class _GameInstructionsOverlayViewState
         description: l10n.gameInstructionsPageAutoRunDescription,
         assetPath: Assets.images.autoRunInstruction.path,
       ),
-      if (isDesktop)
+      if (context.isLarge)
         GameInstruction(
           title: l10n.gameInstructionsPageTapToJumpTitle,
           description: l10n.gameInstructionsPageTapToJumpDescriptionDesktop,
@@ -114,22 +115,22 @@ class _GameInstructionsOverlayViewState
 
   @override
   Widget build(BuildContext context) {
+    final viewport = ResponsiveInsets.instructionsViewportSize(context);
+
     return AppDialog(
-      border: Border.all(color: Colors.white24),
-      backgroundColor: Colors.white24,
       imageProvider: Assets.images.instructionsBackground.provider(),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            width: 390,
-            height: 400,
+            width: viewport.width,
+            height: viewport.height,
             child: PageView.builder(
               controller: pageController,
               onPageChanged: context.read<GameInstructionsCubit>().updateStep,
-              itemCount: instructions.length,
+              itemCount: _instructions(context).length,
               itemBuilder: (context, index) {
-                final instruction = instructions.elementAt(index);
+                final instruction = _instructions(context).elementAt(index);
                 return _CardContent(
                   title: instruction.title,
                   description: instruction.description,
@@ -166,30 +167,34 @@ class _CardContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final tokens = context.appTheme;
     return Column(
       children: [
         _CardImage(assetPath: assetPath),
         const SizedBox(height: 24),
-        Text(
-          title,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-            ),
-            child: Text(
-              description,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: Colors.white,
+        AppSurfaceCard(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: tokens.foreground,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
+              const SizedBox(height: 8),
+              Text(
+                description,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: tokens.mutedForeground,
+                  height: 1.5,
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -204,18 +209,25 @@ class _CardImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = context.appTheme;
+    final imageSize = switch (context.screenLayout) {
+      ScreenLayout.compact => 180.0,
+      ScreenLayout.medium => 200.0,
+      _ => 224.0,
+    };
+
     return SizedBox(
-      width: 224,
-      height: 224,
+      width: imageSize,
+      height: imageSize,
       child: TraslucentBackground(
         border: Border.all(
-          color: Colors.white,
+          color: tokens.border,
         ),
-        gradient: const [
-          Color(0xFFB1B1B1),
-          Color(0xFF363567),
-          Color(0xFFE2F8FA),
-          Colors.white38,
+        gradient: [
+          tokens.muted,
+          tokens.secondary,
+          tokens.card,
+          tokens.card.withValues(alpha: 0.38),
         ],
         child: Positioned.fill(
           child: Image.asset(

@@ -1,4 +1,6 @@
+import 'package:app_ui/src/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Text styles used in the app.
 class AppTextStyles {
@@ -9,7 +11,7 @@ class AppTextStyles {
   static const package = 'app_ui';
 
   /// Creates a [TextTheme] from the text styles.
-  static TextTheme textTheme = TextTheme(
+  static final TextTheme textTheme = TextTheme(
     displayLarge: displayLarge,
     displayMedium: displayMedium,
     displaySmall: displaySmall,
@@ -27,39 +29,71 @@ class AppTextStyles {
     labelSmall: labelSmall,
   );
 
-  static const TextStyle _commonStyle = TextStyle(
-    fontFamily: 'Google Sans',
-    color: Colors.white,
-    package: package,
-    decorationColor: Colors.white,
+  static final TextStyle _commonStyle = GoogleFonts.hostGrotesk(
+    color: AppColors.foreground,
+    decorationColor: AppColors.foreground,
   );
 
   /// Display large text style.
-  static TextStyle get displayLarge => _commonStyle;
+  static TextStyle get displayLarge => _commonStyle.copyWith(
+        fontSize: 48,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -1,
+      );
 
   /// Display medium text style.
-  static TextStyle get displayMedium => _commonStyle;
+  static TextStyle get displayMedium => _commonStyle.copyWith(
+        fontSize: 40,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -.8,
+      );
 
   /// Display small text style.
-  static TextStyle get displaySmall => _commonStyle;
+  static TextStyle get displaySmall => _commonStyle.copyWith(
+        fontSize: 32,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -.6,
+      );
 
   /// Headline large text style.
-  static TextStyle get headlineLarge => _commonStyle;
+  static TextStyle get headlineLarge => _commonStyle.copyWith(
+        fontSize: 32,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -.5,
+      );
 
   /// Headline medium text style.
-  static TextStyle get headlineMedium => _commonStyle;
+  static TextStyle get headlineMedium => _commonStyle.copyWith(
+        fontSize: 28,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -.4,
+      );
 
   /// Headline small text style.
-  static TextStyle get headlineSmall => _commonStyle;
+  static TextStyle get headlineSmall => _commonStyle.copyWith(
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -.3,
+      );
 
   /// Title large text style.
-  static TextStyle get titleLarge => _commonStyle;
+  static TextStyle get titleLarge => _commonStyle.copyWith(
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -.2,
+      );
 
   /// Title medium text style.
-  static TextStyle get titleMedium => _commonStyle;
+  static TextStyle get titleMedium => _commonStyle.copyWith(
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+      );
 
   /// Title small text style.
-  static TextStyle get titleSmall => _commonStyle;
+  static TextStyle get titleSmall => _commonStyle.copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+      );
 
   /// Body large text style.
   static TextStyle get bodyLarge => _commonStyle.copyWith(
@@ -68,17 +102,32 @@ class AppTextStyles {
       );
 
   /// Body medium text style.
-  static TextStyle get bodyMedium => _commonStyle;
+  static TextStyle get bodyMedium => _commonStyle.copyWith(
+        fontSize: 14,
+        height: 1.5,
+      );
 
   /// Body small text style.
-  static TextStyle get bodySmall => _commonStyle;
+  static TextStyle get bodySmall => _commonStyle.copyWith(
+        fontSize: 12,
+        height: 1.45,
+      );
 
   /// Label large text style.
-  static TextStyle get labelLarge => _commonStyle;
+  static TextStyle get labelLarge => _commonStyle.copyWith(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      );
 
   /// Label medium text style.
-  static TextStyle get labelMedium => _commonStyle;
+  static TextStyle get labelMedium => _commonStyle.copyWith(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+      );
 
   /// Label small text style.
-  static TextStyle get labelSmall => _commonStyle;
+  static TextStyle get labelSmall => _commonStyle.copyWith(
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+      );
 }

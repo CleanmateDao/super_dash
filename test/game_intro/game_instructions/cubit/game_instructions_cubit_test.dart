@@ -1,6 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:cleanmate_rush/game_intro/game_instructions/cubit/game_instructions_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:super_dash/game_intro/game_instructions/cubit/game_instructions_cubit.dart';
 
 void main() {
   group('GameInstructionsCubit', () {

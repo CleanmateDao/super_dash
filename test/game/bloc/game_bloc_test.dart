@@ -1,8 +1,9 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:cleanmate_rush/game/bloc/game_bloc.dart';
+import 'package:cleanmate_rush/game/xp_constants.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:super_dash/game/bloc/game_bloc.dart';
 
 void main() {
   group('GameBloc', () {
@@ -10,7 +11,7 @@ void main() {
       'emits GameState initial when GameOver is added',
       build: GameBloc.new,
       seed: () => const GameState(
-        score: 100,
+        xp: 0.015,
         currentLevel: 2,
         currentSection: 2,
       ),
@@ -19,21 +20,11 @@ void main() {
     );
 
     blocTest<GameBloc, GameState>(
-      'emits GameState with score increased correctly '
-      'when GameScoreIncreased is added',
+      'emits GameState with xp increased when GameXpEarned is added',
       build: GameBloc.new,
-      seed: () => const GameState.initial().copyWith(score: 100),
-      act: (bloc) => bloc.add(GameScoreIncreased(by: 2)),
-      expect: () => [const GameState.initial().copyWith(score: 102)],
-    );
-
-    blocTest<GameBloc, GameState>(
-      'emits GameState with score decreased correctly '
-      'when GameScoreDecreased is added',
-      build: GameBloc.new,
-      seed: () => const GameState.initial().copyWith(score: 100),
-      act: (bloc) => bloc.add(GameScoreDecreased(by: 2)),
-      expect: () => [const GameState.initial().copyWith(score: 98)],
+      seed: () => const GameState.initial().copyWith(xp: 0.005),
+      act: (bloc) => bloc.add(const GameXpEarned(amount: xpPerValidHit)),
+      expect: () => [const GameState.initial().copyWith(xp: 0.01)],
     );
   });
 }

@@ -1,14 +1,47 @@
-// ignore_for_file: avoid_print
-
-import 'package:app_ui/app_ui.dart';
+import 'package:app_ui/src/layout/context.dart';
 import 'package:flutter/widgets.dart';
 
+/// Signature for responsive layout builders.
+typedef ResponsiveWidgetBuilder = Widget Function(BuildContext context);
+
 /// Signature for the individual builders (`small`, `large`).
-typedef ResponsiveLayoutWidgetBuilder = Widget Function(BuildContext, Widget?);
+typedef ResponsiveLayoutWidgetBuilder = Widget Function(
+  BuildContext context,
+  Widget? child,
+);
+
+/// Builds different layouts for phone, tablet, and desktop widths.
+class ResponsiveLayout extends StatelessWidget {
+  const ResponsiveLayout({
+    required this.compact,
+    required this.child,
+    this.medium,
+    this.large,
+    this.extraLarge,
+    super.key,
+  });
+
+  final ResponsiveWidgetBuilder compact;
+  final ResponsiveWidgetBuilder? medium;
+  final ResponsiveWidgetBuilder? large;
+  final ResponsiveWidgetBuilder? extraLarge;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    final layout = context.screenLayout;
+    final builder = switch (layout) {
+      ScreenLayout.extraLarge => extraLarge ?? large ?? medium ?? compact,
+      ScreenLayout.large => large ?? medium ?? compact,
+      ScreenLayout.medium => medium ?? compact,
+      ScreenLayout.compact => compact,
+    };
+    return builder(context);
+  }
+}
 
 /// {@template responsive_layout_builder}
-/// A wrapper around [LayoutBuilder] which exposes builders for
-/// various responsive breakpoints.
+/// A wrapper which exposes builders for small vs large layouts.
 /// {@endtemplate}
 class ResponsiveLayoutBuilder extends StatelessWidget {
   /// {@macro responsive_layout_builder}
@@ -32,7 +65,9 @@ class ResponsiveLayoutBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (context.isSmall) return small(context, child);
+    if (context.isSmall) {
+      return small(context, child);
+    }
     return large(context, child);
   }
 }

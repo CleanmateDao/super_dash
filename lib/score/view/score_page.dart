@@ -1,30 +1,28 @@
+import 'package:cleanmate_rush/score/bloc/score_bloc.dart';
+import 'package:cleanmate_rush/score/routes/routes.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:leaderboard_repository/leaderboard_repository.dart';
-import 'package:super_dash/score/bloc/score_bloc.dart';
-import 'package:super_dash/score/routes/routes.dart';
 
 class ScorePage extends StatelessWidget {
   const ScorePage({
-    required this.score,
+    required this.xp,
     super.key,
   });
 
-  static PageRoute<void> route({required int score}) {
+  static PageRoute<void> route({required double xp}) {
     return PageRouteBuilder(
-      pageBuilder: (_, __, ___) => ScorePage(score: score),
+      pageBuilder: (_, __, ___) => ScorePage(xp: xp),
     );
   }
 
-  final int score;
+  final double xp;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => ScoreBloc(
-        score: score,
-        leaderboardRepository: context.read<LeaderboardRepository>(),
+        xp: xp,
       ),
       child: const ScoreView(),
     );

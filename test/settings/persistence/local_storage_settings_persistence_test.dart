@@ -1,6 +1,6 @@
+import 'package:cleanmate_rush/settings/persistence/persistence.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:super_dash/settings/persistence/persistence.dart';
 
 void main() {
   group('LocalStorageSettingsPersistence', () {

@@ -1,14 +1,14 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:cleanmate_rush/audio/audio.dart';
+import 'package:cleanmate_rush/game/cleanmate_rush_game.dart';
+import 'package:cleanmate_rush/map_tester/map_tester.dart';
+import 'package:cleanmate_rush/settings/settings_controller.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:super_dash/audio/audio.dart';
-import 'package:super_dash/game/super_dash_game.dart';
-import 'package:super_dash/map_tester/map_tester.dart';
-import 'package:super_dash/settings/settings_controller.dart';
 
 import '../../helpers/helpers.dart';
 
@@ -28,47 +28,35 @@ void main() {
     });
 
     testWidgets('renders', (tester) async {
-      await tester.pumpSubject(
-        () async => '',
-        settingsController: settingsController,
-      );
+      await tester.pumpSubject(settingsController: settingsController);
 
       expect(find.byType(MapTesterView), findsOneWidget);
     });
 
-    testWidgets('allows to select a game folder', (tester) async {
+    testWidgets('loads the game', (tester) async {
       tester.setViewSize();
 
-      Future<String> getDirectoryPath() async => '.';
-
-      await tester.pumpSubject(
-        getDirectoryPath,
-        settingsController: settingsController,
-      );
+      await tester.pumpSubject(settingsController: settingsController);
 
       await tester.tap(find.text('Load'));
       await tester.pump();
 
       expect(
-        find.byType(GameWidget<SuperDashGame>),
+        find.byType(GameWidget<CleanmateRushGame>),
         findsOneWidget,
       );
     });
 
     testWidgets('can unload the game', (tester) async {
       tester.setViewSize();
-      Future<String> getDirectoryPath() async => '.';
 
-      await tester.pumpSubject(
-        getDirectoryPath,
-        settingsController: settingsController,
-      );
+      await tester.pumpSubject(settingsController: settingsController);
 
       await tester.tap(find.text('Load'));
       await tester.pump();
 
       expect(
-        find.byType(GameWidget<SuperDashGame>),
+        find.byType(GameWidget<CleanmateRushGame>),
         findsOneWidget,
       );
 
@@ -76,25 +64,21 @@ void main() {
       await tester.pump();
 
       expect(
-        find.byType(GameWidget<SuperDashGame>),
+        find.byType(GameWidget<CleanmateRushGame>),
         findsNothing,
       );
     });
 
     testWidgets('allows to reload a game', (tester) async {
       tester.setViewSize();
-      Future<String> getDirectoryPath() async => '.';
 
-      await tester.pumpSubject(
-        getDirectoryPath,
-        settingsController: settingsController,
-      );
+      await tester.pumpSubject(settingsController: settingsController);
 
       await tester.tap(find.text('Load'));
       await tester.pump();
 
-      var widget = tester.widget<GameWidget<SuperDashGame>>(
-        find.byType(GameWidget<SuperDashGame>),
+      var widget = tester.widget<GameWidget<CleanmateRushGame>>(
+        find.byType(GameWidget<CleanmateRushGame>),
       );
 
       final originalGame = widget.game;
@@ -103,8 +87,8 @@ void main() {
       await tester.tap(find.text('Reload'));
       await tester.pumpAndSettle();
 
-      widget = tester.widget<GameWidget<SuperDashGame>>(
-        find.byType(GameWidget<SuperDashGame>),
+      widget = tester.widget<GameWidget<CleanmateRushGame>>(
+        find.byType(GameWidget<CleanmateRushGame>),
       );
 
       final updatedGame = widget.game;
@@ -115,8 +99,7 @@ void main() {
 }
 
 extension on WidgetTester {
-  Future<void> pumpSubject(
-    Future<String> Function() getDirectoryPath, {
+  Future<void> pumpSubject({
     AudioController? audioController,
     SettingsController? settingsController,
   }) async {
@@ -131,7 +114,6 @@ extension on WidgetTester {
           ),
         ],
         child: MapTesterView(
-          selectGameFolder: getDirectoryPath,
           timer: Future.value,
         ),
       ),

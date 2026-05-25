@@ -23,11 +23,38 @@ class LeaderboardEntryData extends Equatable {
   const LeaderboardEntryData({
     required this.playerInitials,
     required this.score,
+    this.rank,
+    this.userId,
+    this.profileName,
+    this.walletAddress,
+    this.weekXp = 0,
+    this.previousWeekXp = 0,
+    this.rewardPoolAmount,
   });
 
   /// Factory which converts a [Map] into a [LeaderboardEntryData].
   factory LeaderboardEntryData.fromJson(Map<String, dynamic> json) {
     return _$LeaderboardEntryDataFromJson(json);
+  }
+
+  /// Factory which converts a weekly Cleanmate XP API entry into a
+  /// [LeaderboardEntryData].
+  factory LeaderboardEntryData.fromWeeklyJson(Map<String, dynamic> json) {
+    final weekXp = (json['weekXp'] as num?)?.toDouble() ?? 0;
+    final profileName = json['profileName'] as String?;
+    final walletAddress = json['walletAddress'] as String?;
+
+    return LeaderboardEntryData(
+      playerInitials: profileName ?? walletAddress ?? '',
+      score: weekXp.round(),
+      rank: json['rank'] as int?,
+      userId: json['userId'] as String?,
+      profileName: profileName,
+      walletAddress: walletAddress,
+      weekXp: weekXp,
+      previousWeekXp: (json['previousWeekXp'] as num?)?.toDouble() ?? 0,
+      rewardPoolAmount: json['rewardPoolAmount'] as num?,
+    );
   }
 
   /// Converts the [LeaderboardEntryData] to [Map].
@@ -45,6 +72,34 @@ class LeaderboardEntryData extends Equatable {
   @JsonKey(name: 'score')
   final int score;
 
+  /// Player's weekly leaderboard rank.
+  @JsonKey(name: 'rank')
+  final int? rank;
+
+  /// Cleanmate API user id.
+  @JsonKey(name: 'userId')
+  final String? userId;
+
+  /// Cleanmate profile name.
+  @JsonKey(name: 'profileName')
+  final String? profileName;
+
+  /// Linked wallet address.
+  @JsonKey(name: 'walletAddress')
+  final String? walletAddress;
+
+  /// XP earned during the selected week.
+  @JsonKey(name: 'weekXp')
+  final double weekXp;
+
+  /// XP earned during the previous week.
+  @JsonKey(name: 'previousWeekXp')
+  final double previousWeekXp;
+
+  /// Reward pool amount for the entry.
+  @JsonKey(name: 'rewardPoolAmount')
+  final num? rewardPoolAmount;
+
   /// An empty [LeaderboardEntryData] object.
   static const empty = LeaderboardEntryData(
     score: 0,
@@ -52,5 +107,15 @@ class LeaderboardEntryData extends Equatable {
   );
 
   @override
-  List<Object?> get props => [playerInitials, score];
+  List<Object?> get props => [
+        playerInitials,
+        score,
+        rank,
+        userId,
+        profileName,
+        walletAddress,
+        weekXp,
+        previousWeekXp,
+        rewardPoolAmount,
+      ];
 }

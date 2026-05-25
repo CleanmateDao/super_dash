@@ -1,20 +1,16 @@
 import 'dart:async';
 
+import 'package:cleanmate_rush/game/cleanmate_rush_game.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
 import 'package:leap/leap.dart';
-import 'package:super_dash/game/super_dash_game.dart';
 
 enum ItemType {
-  acorn(10),
-  egg(1000),
-  goldenFeather(0);
-
-  const ItemType(this.points);
-
-  final int points;
+  acorn,
+  egg,
+  goldenFeather;
 
   static ItemType fromType(String? type) {
     if (type == 'Egg') {
@@ -26,7 +22,7 @@ enum ItemType {
   }
 }
 
-class Item extends PhysicalEntity<SuperDashGame> {
+class Item extends PhysicalEntity<CleanmateRushGame> {
   Item({
     required this.tiledObject,
   }) : super(static: true, collisionType: CollisionType.standard);

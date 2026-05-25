@@ -3,8 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 const Set<Song> songs = {
-  // Filenames with whitespace break package:audioplayers on iOS
-  // (as of February 2022), so we use no whitespace.
+  // Filenames with whitespace can break some audio backends, so we use none.
   Song(
     'FlutterGame_SunshineAndDewdrops_1_1.mp3',
     'Sunshin and Dewdrops',

@@ -1,10 +1,9 @@
 import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/game_intro/game_intro.dart';
+import 'package:cleanmate_rush/leaderboard/leaderboard.dart';
+import 'package:cleanmate_rush/settings/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:super_dash/game_intro/game_intro.dart';
-import 'package:super_dash/leaderboard/leaderboard.dart';
-import 'package:super_dash/settings/settings_controller.dart';
 
 class AudioButton extends StatelessWidget {
   const AudioButton({super.key});
@@ -15,7 +14,7 @@ class AudioButton extends StatelessWidget {
     return ValueListenableBuilder<bool>(
       valueListenable: settingsController.muted,
       builder: (context, muted, child) => GameIconButton(
-        icon: muted ? Icons.volume_off : Icons.volume_up,
+        icon: muted ? Icons.volume_off_outlined : Icons.volume_up_outlined,
         onPressed: context.read<SettingsController>().toggleMuted,
       ),
     );
@@ -28,7 +27,7 @@ class LeaderboardButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GameIconButton(
-      icon: FontAwesomeIcons.trophy,
+      icon: Icons.emoji_events_outlined,
       size: 18,
       alignment: const Alignment(-0.3, 0),
       onPressed: () => Navigator.of(context).push(LeaderboardPage.route()),
@@ -42,7 +41,7 @@ class InfoButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GameIconButton(
-      icon: Icons.info,
+      icon: Icons.info_outline,
       onPressed: () => Navigator.of(context).push(GameInfoDialog.route()),
     );
   }
@@ -54,7 +53,7 @@ class HowToPlayButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GameIconButton(
-      icon: Icons.help,
+      icon: Icons.help_outline,
       onPressed: () => Navigator.of(context).push(
         GameInstructionsOverlay.route(),
       ),

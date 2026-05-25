@@ -1,16 +1,9 @@
-import 'dart:io';
-
-import 'package:file_selector/file_selector.dart';
+import 'package:cleanmate_rush/game/game.dart';
+import 'package:cleanmate_rush/map_tester/map_tester.dart';
+import 'package:cleanmate_rush/settings/settings_controller.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:super_dash/filesytem_asset_bundle/filesystem_asset_bundle.dart';
-import 'package:super_dash/game/game.dart';
-import 'package:super_dash/map_tester/map_tester.dart';
-import 'package:super_dash/settings/settings_controller.dart';
-
-typedef GetDirectoryPath = Future<String?> Function();
 
 Future<void> _defaultTimer() {
   return Future<void>.delayed(const Duration(milliseconds: 800));
@@ -18,12 +11,10 @@ Future<void> _defaultTimer() {
 
 class MapTesterView extends StatefulWidget {
   const MapTesterView({
-    this.selectGameFolder = getDirectoryPath,
     this.timer = _defaultTimer,
     super.key,
   });
 
-  final GetDirectoryPath selectGameFolder;
   final Future<void> Function() timer;
 
   @override
@@ -31,8 +22,7 @@ class MapTesterView extends StatefulWidget {
 }
 
 class _MapTesterViewState extends State<MapTesterView> {
-  SuperDashGame? game;
-  String? rootPath;
+  CleanmateRushGame? game;
 
   double? speed;
   double? jumpImpulse;
@@ -48,46 +38,21 @@ class _MapTesterViewState extends State<MapTesterView> {
   }
 
   Future<void> _createGame() async {
-    if (!kIsWeb && Platform.isMacOS) {
-      final directory = await widget.selectGameFolder();
-      if (directory != null) {
-        setState(() {
-          rootPath = directory;
-          game = SuperDashGame(
-            gameBloc: GameBloc(),
-            customBundle: FileSystemAssetBundle(directory),
-            audioController: context.read(),
-            inMapTester: true,
-          );
-        });
-      }
-    } else {
-      setState(() {
-        game = SuperDashGame(
-          gameBloc: GameBloc(),
-          audioController: context.read(),
-          inMapTester: true,
-        );
-      });
-    }
+    setState(() {
+      game = CleanmateRushGame(
+        gameBloc: GameBloc(),
+        audioController: context.read(),
+        inMapTester: true,
+      );
+    });
   }
 
   Future<void> _reload() async {
-    late SuperDashGame newGame;
-    if (!kIsWeb && Platform.isMacOS) {
-      newGame = SuperDashGame(
-        gameBloc: GameBloc(),
-        audioController: context.read(),
-        customBundle: FileSystemAssetBundle(rootPath!),
-        inMapTester: true,
-      );
-    } else {
-      newGame = SuperDashGame(
-        gameBloc: GameBloc(),
-        audioController: context.read(),
-        inMapTester: true,
-      );
-    }
+    final newGame = CleanmateRushGame(
+      gameBloc: GameBloc(),
+      audioController: context.read(),
+      inMapTester: true,
+    );
 
     setState(() {
       game = newGame;

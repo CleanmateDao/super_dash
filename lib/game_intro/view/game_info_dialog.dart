@@ -1,11 +1,11 @@
 import 'dart:ui';
 
 import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/constants/constants.dart';
+import 'package:cleanmate_rush/gen/assets.gen.dart';
+import 'package:cleanmate_rush/l10n/l10n.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:super_dash/constants/constants.dart';
-import 'package:super_dash/gen/assets.gen.dart';
-import 'package:super_dash/l10n/l10n.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class GameInfoDialog extends StatelessWidget {
@@ -13,9 +13,11 @@ class GameInfoDialog extends StatelessWidget {
 
   static PageRoute<void> route() {
     return HeroDialogRoute(
-      builder: (_) => BackdropFilter(
+      builder: (context) => BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        child: const GameInfoDialog(),
+        child: const ResponsiveDialogFrame(
+          child: GameInfoDialog(),
+        ),
       ),
     );
   }
@@ -23,68 +25,41 @@ class GameInfoDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final bodyStyle = AppTextStyles.bodyLarge;
-    const highlightColor = Color(0xFF9CECCD);
-    final linkStyle = AppTextStyles.bodyLarge.copyWith(
-      color: highlightColor,
+    final tokens = context.appTheme;
+    final textTheme = Theme.of(context).textTheme;
+    final linkStyle = textTheme.bodyLarge?.copyWith(
+      color: tokens.primary,
       decoration: TextDecoration.underline,
-      decorationColor: highlightColor,
+      decorationColor: tokens.primary,
+      fontWeight: FontWeight.w700,
     );
     return AppDialog(
-      border: Border.all(color: Colors.white24),
+      backgroundColor: tokens.card,
+      gradient: tokens.cardGradient,
+      border: Border.all(color: tokens.border),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 24),
-          Assets.images.gameLogo.image(width: 230),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final logoWidth = ResponsiveInsets.logoWidth(context) * 0.6;
+              return Assets.images.gameLogo.image(width: logoWidth);
+            },
+          ),
           const SizedBox(height: 40),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Column(
               children: [
                 Text(
-                  l10n.aboutSuperDash,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 24),
-                RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    style: bodyStyle,
-                    children: [
-                      TextSpan(text: l10n.learn),
-                      TextSpan(
-                        text: l10n.howWeBuiltSuperDash,
-                        style: linkStyle,
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () => launchUrlString(Urls.howWeBuilt),
-                      ),
-                      TextSpan(
-                        text: l10n.inFlutterAndGrabThe,
-                      ),
-                      TextSpan(
-                        text: l10n.openSourceCode,
-                        style: linkStyle,
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () => launchUrlString(Urls.githubRepo),
-                      ),
-                    ],
+                  l10n.aboutCleanmateRush,
+                  style: textTheme.headlineSmall?.copyWith(
+                    color: tokens.foreground,
+                    fontWeight: FontWeight.w800,
                   ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  l10n.otherLinks,
-                  style: bodyStyle,
                 ),
                 const SizedBox(height: 16),
-                RichText(
-                  text: TextSpan(
-                    text: l10n.flutterGames,
-                    style: linkStyle,
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () => launchUrlString(Urls.flutterGames),
-                  ),
-                ),
                 RichText(
                   text: TextSpan(
                     text: l10n.privacyPolicy,

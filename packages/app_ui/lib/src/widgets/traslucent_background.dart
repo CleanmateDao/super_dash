@@ -1,3 +1,4 @@
+import 'package:app_ui/src/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 /// {@template traslucent_background}
@@ -31,18 +32,17 @@ class TraslucentBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = context.appTheme;
     return Stack(
       children: [
         Positioned.fill(
-          child: Opacity(
-            opacity: 0.4,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                shape: shape,
-                border: border,
-                borderRadius: borderRadius,
-                gradient: LinearGradient(colors: gradient),
-              ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              shape: shape,
+              border: border,
+              borderRadius: borderRadius,
+              gradient: LinearGradient(colors: gradient),
+              boxShadow: tokens.softShadow,
             ),
           ),
         ),

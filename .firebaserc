@@ -10,10 +10,10 @@
         ]
       }
     },
-    "super-dash-game": {
+    "cleanmate-rush-game": {
       "hosting": {
         "app_prod": [
-          "super-dash-game"
+          "cleanmate-rush-game"
         ]
       }
     }

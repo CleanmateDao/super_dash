@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:cleanmate_rush/audio/audio.dart';
+import 'package:cleanmate_rush/game/game.dart';
 import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
 import 'package:flame_test/flame_test.dart';
@@ -9,8 +11,6 @@ import 'package:flutter/src/services/asset_bundle.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:leap/leap.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:super_dash/audio/audio.dart';
-import 'package:super_dash/game/game.dart';
 
 class _MockImage extends Mock implements Image {}
 
@@ -31,8 +31,8 @@ class _MockRenderableTiledMap extends Mock implements RenderableTiledMap {}
 
 class _MockTileset extends Mock implements Tileset {}
 
-class _TestSuperDashGame extends SuperDashGame {
-  _TestSuperDashGame({
+class _TestCleanmateRushGame extends CleanmateRushGame {
+  _TestCleanmateRushGame({
     required super.gameBloc,
     required super.audioController,
     this.spawnObects = const [],
@@ -152,8 +152,8 @@ void main() {
       when(() => gameBloc.state).thenReturn(const GameState.initial());
     });
 
-    _TestSuperDashGame createGame() {
-      return _TestSuperDashGame(
+    _TestCleanmateRushGame createGame() {
+      return _TestCleanmateRushGame(
         gameBloc: gameBloc,
         audioController: audioController,
         spawnObects: [

@@ -1,7 +1,9 @@
+import 'package:app_ui/src/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 /// {@template game_button}
-/// Common elevated button for the screens in the game.
+/// Primary action button aligned with the Cleanmate React `Button` default
+/// variant (`gradient-primary`, `text-sm`, `font-medium`, `shadow-block-primary`).
 /// {@endtemplate}
 class GameElevatedButton extends StatelessWidget {
   /// {@macro game_button}
@@ -9,6 +11,7 @@ class GameElevatedButton extends StatelessWidget {
     required String label,
     VoidCallback? onPressed,
     this.gradient,
+    this.expanded = false,
     super.key,
   }) : _child = FilledButton(
           onPressed: onPressed,
@@ -21,6 +24,7 @@ class GameElevatedButton extends StatelessWidget {
     required Icon icon,
     VoidCallback? onPressed,
     this.gradient,
+    this.expanded = false,
     super.key,
   }) : _child = FilledButton.icon(
           icon: icon,
@@ -30,40 +34,46 @@ class GameElevatedButton extends StatelessWidget {
 
   final Widget _child;
 
-  /// The gradient to use for the background.
+  /// The gradient to use for the background (`gradient-primary` by default).
   final Gradient? gradient;
+
+  /// When true, expands to the max width of the parent (React `w-full`).
+  final bool expanded;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final tokens = context.appTheme;
+    final resolvedGradient = gradient ?? tokens.primaryGradient;
+    final labelColor = tokens.labelColorForGradient(resolvedGradient);
+
     return Container(
-      width: 200,
+      width: expanded ? double.infinity : null,
+      constraints: const BoxConstraints(minWidth: 120, minHeight: 40),
       decoration: BoxDecoration(
-        gradient: gradient ??
-            const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFFADD7CD),
-                Color(0xFF57AEA5),
-              ],
-            ),
-        border: Border.all(color: Colors.white24),
-        borderRadius: BorderRadius.circular(94),
+        gradient: resolvedGradient,
+        borderRadius: AppRadii.buttonBorder,
+        boxShadow: tokens.blockShadowForGradient(resolvedGradient),
       ),
       child: Theme(
         data: theme.copyWith(
           filledButtonTheme: FilledButtonThemeData(
             style: FilledButton.styleFrom(
               backgroundColor: Colors.transparent,
+              disabledBackgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(94),
+              foregroundColor: labelColor,
+              disabledForegroundColor: labelColor.withValues(alpha: 0.5),
+              shape: const RoundedRectangleBorder(
+                borderRadius: AppRadii.buttonBorder,
               ),
-              padding: const EdgeInsets.symmetric(vertical: 22),
+              minimumSize: const Size(0, 40),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               textStyle: theme.textTheme.labelLarge?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+                color: labelColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                height: 1.2,
               ),
             ),
           ),

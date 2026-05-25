@@ -9,18 +9,9 @@ class AppDialog extends StatelessWidget {
   const AppDialog({
     required this.child,
     this.showCloseButton = true,
-    this.backgroundColor = const Color(0xE51B1B36),
-    this.gradient = const LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [
-        Color.fromARGB(81, 177, 177, 177),
-        Color.fromARGB(51, 54, 53, 103),
-        Color.fromARGB(230, 27, 27, 54),
-      ],
-      stops: [0.05, 0.5, 1],
-    ),
-    this.borderRadius = const BorderRadius.all(Radius.circular(24)),
+    this.backgroundColor,
+    this.gradient,
+    this.borderRadius = AppRadii.xlBorder,
     this.border,
     this.imageProvider,
     super.key,
@@ -50,14 +41,16 @@ class AppDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = context.appTheme;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: borderRadius),
       child: AppCard(
-        border: border,
-        gradient: gradient,
-        backgroundColor: backgroundColor,
+        border: border ?? Border.all(color: tokens.border),
+        gradient: gradient ?? tokens.cardGradient,
+        backgroundColor: backgroundColor ?? tokens.card,
         borderRadius: borderRadius,
         imageProvider: imageProvider,
         child: SingleChildScrollView(
@@ -70,7 +63,7 @@ class AppDialog extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     GameIconButton(
-                      icon: Icons.close,
+                      icon: Icons.close_outlined,
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],

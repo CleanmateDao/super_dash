@@ -1,0 +1,47 @@
+# Mirrors firebase.json hosting headers for Amplify Hosting (CloudFront).
+# More specific patterns must appear before the catch-all.
+customHeaders:
+  - pattern: '**/*.eot'
+    headers:
+      - key: Access-Control-Allow-Origin
+        value: '*'
+  - pattern: '**/*.otf'
+    headers:
+      - key: Access-Control-Allow-Origin
+        value: '*'
+  - pattern: '**/*.ttf'
+    headers:
+      - key: Access-Control-Allow-Origin
+        value: '*'
+  - pattern: '**/*.ttc'
+    headers:
+      - key: Access-Control-Allow-Origin
+        value: '*'
+  - pattern: '**/*.woff'
+    headers:
+      - key: Access-Control-Allow-Origin
+        value: '*'
+  - pattern: '**/*.woff2'
+    headers:
+      - key: Access-Control-Allow-Origin
+        value: '*'
+  - pattern: '**/*.jpg'
+    headers:
+      - key: Cache-Control
+        value: max-age=3600
+  - pattern: '**/*.jpeg'
+    headers:
+      - key: Cache-Control
+        value: max-age=3600
+  - pattern: '**/*.gif'
+    headers:
+      - key: Cache-Control
+        value: max-age=3600
+  - pattern: '**/*.png'
+    headers:
+      - key: Cache-Control
+        value: max-age=3600
+  - pattern: '**/*'
+    headers:
+      - key: Cache-Control
+        value: no-cache, no-store, must-revalidate

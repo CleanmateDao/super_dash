@@ -1,0 +1,26 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - chmod +x scripts/amplify_install_flutter.sh scripts/amplify_flutter_target.sh
+        - ./scripts/amplify_install_flutter.sh
+    build:
+      commands:
+        - export PATH="${HOME}/flutter/bin:${PATH}"
+        - export FLUTTER_TARGET="$(./scripts/amplify_flutter_target.sh)"
+        - echo "Building Cleanmate Rush with ${FLUTTER_TARGET} (branch ${AWS_BRANCH:-unknown})"
+        - flutter build web --web-renderer canvaskit -t "${FLUTTER_TARGET}"
+  artifacts:
+    baseDirectory: build/web
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - ${HOME}/flutter/.pub-cache/**/*
+      - ${HOME}/flutter/bin/cache/**/*
+      - .dart_tool/**/*
+  customRedirects:
+    - source: '/<*>'
+      target: '/index.html'
+      status: '404-200'

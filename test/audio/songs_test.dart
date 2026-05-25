@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_const_constructors
+import 'package:cleanmate_rush/audio/songs.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:super_dash/audio/songs.dart';
 
 void main() {
   group('Song', () {

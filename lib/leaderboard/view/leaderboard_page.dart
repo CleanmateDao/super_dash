@@ -1,17 +1,18 @@
 import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/game/game.dart';
+import 'package:cleanmate_rush/gen/assets.gen.dart';
+import 'package:cleanmate_rush/l10n/l10n.dart';
+import 'package:cleanmate_rush/leaderboard/bloc/leaderboard_bloc.dart';
+import 'package:cleanmate_rush/score/score.dart';
+import 'package:cleanmate_rush/user_identity/user_identity.dart';
+import 'package:cleanmate_rush/widgets/xp_icon.dart';
 import 'package:flame/cache.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flame/widgets.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:leaderboard_repository/leaderboard_repository.dart';
-import 'package:super_dash/game/game.dart';
-import 'package:super_dash/gen/assets.gen.dart';
-import 'package:super_dash/l10n/l10n.dart';
-import 'package:super_dash/leaderboard/bloc/leaderboard_bloc.dart';
-import 'package:super_dash/score/score.dart';
 
 enum LeaderboardStep { gameIntro, gameScore }
 
@@ -61,6 +62,7 @@ class LeaderboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final tokens = context.appTheme;
     return PageWithBackground(
       background: const GameBackground(),
       child: DecoratedBox(
@@ -70,37 +72,45 @@ class LeaderboardView extends StatelessWidget {
             fit: BoxFit.fill,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: MediaQuery.sizeOf(context).height * .15,
-            ),
-            const Leaderboard(),
-            const SizedBox(height: 20),
-            Align(
-              child: switch (step) {
-                LeaderboardStep.gameIntro => GameElevatedButton(
-                    label: l10n.leaderboardPageGoBackButton,
-                    onPressed: Navigator.of(context).pop,
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xFFA6C3DF),
-                        Color(0xFF79AACA),
-                      ],
+        child: ResponsivePage(
+          scrollable: true,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                height: switch (context.screenLayout) {
+                  ScreenLayout.compact => 24,
+                  ScreenLayout.medium => 40,
+                  _ => MediaQuery.sizeOf(context).height * 0.08,
+                },
+              ),
+              const Leaderboard(),
+              const SizedBox(height: 20),
+              Align(
+                child: switch (step) {
+                  LeaderboardStep.gameIntro => GameElevatedButton(
+                      label: l10n.leaderboardPageGoBackButton,
+                      onPressed: Navigator.of(context).pop,
+                      gradient: tokens.blueGradient,
                     ),
-                  ),
-                LeaderboardStep.gameScore => GameElevatedButton.icon(
-                    label: l10n.playAgain,
-                    icon: const Icon(Icons.refresh, size: 16),
-                    onPressed: context.flow<ScoreState>().complete,
-                  ),
-              },
-            ),
-          ],
+                  LeaderboardStep.gameScore => GameElevatedButton.icon(
+                      label: l10n.playAgain,
+                      icon: Icon(
+                        Icons.refresh_outlined,
+                        size: 16,
+                        color: tokens.primaryForeground,
+                      ),
+                      onPressed: context.flow<ScoreState>().complete,
+                      gradient: tokens.blueGradient,
+                    ),
+                },
+              ),
+              SizedBox(
+                height: ResponsiveInsets.pageVertical(context),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -110,35 +120,31 @@ class LeaderboardView extends StatelessWidget {
 class Leaderboard extends StatelessWidget {
   const Leaderboard({super.key});
 
-  static const width = 360.0;
-  static const height = 420.0;
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF4E4F65),
-            Color(0xFF1B1B36),
-          ],
+    final tokens = context.appTheme;
+    final panelSize = ResponsiveInsets.leaderboardPanelSize(context);
+
+    return Align(
+      child: Container(
+        width: panelSize.width,
+        height: panelSize.height,
+        decoration: BoxDecoration(
+          borderRadius: AppRadii.xlBorder,
+          gradient: tokens.cardGradient,
+          border: Border.all(color: tokens.border),
+          boxShadow: tokens.cardShadow,
         ),
-      ),
-      child: BlocBuilder<LeaderboardBloc, LeaderboardState>(
-        builder: (context, state) => switch (state) {
-          LeaderboardInitial() => const SizedBox.shrink(),
-          LeaderboardLoading() =>
-            const Center(child: LeaderboardLoadingWidget()),
-          LeaderboardError() => const Center(child: LeaderboardErrorWidget()),
-          LeaderboardLoaded(entries: final entries) =>
-            LeaderboardContent(entries: entries),
-        },
+        child: BlocBuilder<LeaderboardBloc, LeaderboardState>(
+          builder: (context, state) => switch (state) {
+            LeaderboardInitial() => const SizedBox.shrink(),
+            LeaderboardLoading() =>
+              const Center(child: LeaderboardLoadingWidget()),
+            LeaderboardError() => const Center(child: LeaderboardErrorWidget()),
+            LeaderboardLoaded(entries: final entries) =>
+              LeaderboardContent(entries: entries),
+          },
+        ),
       ),
     );
   }
@@ -168,7 +174,12 @@ class LeaderboardErrorWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        Text(context.l10n.leaderboardPageLeaderboardErrorText),
+        Text(
+          context.l10n.leaderboardPageLeaderboardErrorText,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: context.appTheme.mutedForeground,
+              ),
+        ),
       ],
     );
   }
@@ -209,6 +220,7 @@ class LeaderboardContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
+    final tokens = context.appTheme;
     return Stack(
       children: [
         Padding(
@@ -216,19 +228,36 @@ class LeaderboardContent extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                l10n.leaderboardPageLeaderboardHeadline,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
+              const _LeaderboardPeriodHeader(),
+              const SizedBox(height: 18),
               if (entries.isEmpty)
                 Center(child: Text(l10n.leaderboardPageLeaderboardNoEntries))
-              else
+              else ...[
+                Text(
+                  'Showing ${entries.length} ranked',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: tokens.mutedForeground,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'RANKINGS',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: tokens.mutedForeground,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Divider(color: tokens.border, height: 1),
                 Flexible(
                   child: _LeaderboardEntries(entries: entries),
                 ),
+              ],
               const SizedBox(height: 30),
             ],
           ),
@@ -237,24 +266,100 @@ class LeaderboardContent extends StatelessWidget {
           left: 0,
           right: 0,
           bottom: 0,
-          child: Container(
-            width: Leaderboard.width,
-            height: Leaderboard.height * .2,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: [0.0, 0.8],
-                colors: [
-                  Colors.transparent,
-                  Color(0xFF1B1B36),
-                ],
-              ),
-            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Container(
+                width: constraints.maxWidth,
+                height: constraints.maxHeight * 0.2,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: const [0.0, 0.8],
+                    colors: [
+                      Colors.transparent,
+                      tokens.card,
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ],
+    );
+  }
+}
+
+class _LeaderboardPeriodHeader extends StatelessWidget {
+  const _LeaderboardPeriodHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final tokens = context.appTheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: tokens.card,
+        borderRadius: AppRadii.lgBorder,
+        border: Border.all(color: tokens.border),
+        boxShadow: tokens.softShadow,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Row(
+          children: [
+            _PeriodButton(
+              icon: Icons.chevron_left_outlined,
+              onPressed: () {},
+            ),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'This week',
+                    style: textTheme.titleSmall?.copyWith(
+                      color: tokens.foreground,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Weeks are UTC',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: tokens.mutedForeground,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            _PeriodButton(
+              icon: Icons.chevron_right_outlined,
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PeriodButton extends StatelessWidget {
+  const _PeriodButton({
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return GameIconButton(
+      icon: icon,
+      onPressed: onPressed,
     );
   }
 }
@@ -266,47 +371,117 @@ class _LeaderboardEntries extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final tokens = context.appTheme;
     return ListView.separated(
       padding: EdgeInsets.zero,
-      separatorBuilder: (context, index) => const Divider(color: Colors.grey),
+      separatorBuilder: (context, index) {
+        return Divider(color: tokens.border, height: 1);
+      },
       itemCount: entries.length,
       itemBuilder: (context, index) {
         final entry = entries.elementAt(index);
-        return ListTile(
-          dense: true,
-          minVerticalPadding: 0,
-          contentPadding: EdgeInsets.zero,
-          leading: Text('#${index + 1}'),
-          title: Text(entry.playerInitials),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
+        final walletAddress = entry.walletAddress;
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Row(
             children: [
-              if ([0, 1, 2].contains(index)) ...[
-                Icon(
-                  FontAwesomeIcons.trophy,
-                  size: 20,
-                  color: switch (index) {
-                    0 => const Color(0xFFD4AF37),
-                    1 => const Color(0xFFC0C0C0),
-                    _ => const Color(0xFFCD7F32),
-                  },
+              SizedBox(
+                width: 32,
+                child: Text(
+                  '${entry.rank ?? index + 1}',
+                  style: textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-                const SizedBox(width: 10),
-              ],
-              Text(l10n.gameScoreLabel(entry.score)),
+              ),
+              WalletAvatar(
+                walletAddress: walletAddress ?? entry.playerInitials,
+                size: 40,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: walletAddress == null
+                    ? Text(
+                        entry.playerInitials,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      )
+                    : WalletUsernameText(
+                        walletAddress: walletAddress,
+                        profileName: entry.profileName,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+              ),
+              const SizedBox(width: 8),
+              _LeaderboardEntryScore(entry: entry),
             ],
-          ),
-          titleTextStyle: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-          leadingAndTrailingTextStyle: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
           ),
         );
       },
+    );
+  }
+}
+
+class _LeaderboardEntryScore extends StatelessWidget {
+  const _LeaderboardEntryScore({required this.entry});
+
+  final LeaderboardEntryData entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final tokens = context.appTheme;
+    final xpDelta = entry.weekXp - entry.previousWeekXp;
+    final rewardPoolAmount = entry.rewardPoolAmount;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              xpDelta >= 0
+                  ? Icons.trending_up_outlined
+                  : Icons.trending_down_outlined,
+              color: xpDelta >= 0 ? tokens.success : tokens.destructive,
+              size: 15,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              entry.weekXp.toStringAsFixed(2),
+              style: textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(width: 3),
+            const XpIcon(size: 16),
+          ],
+        ),
+        if (rewardPoolAmount != null) ...[
+          const SizedBox(height: 2),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '+${rewardPoolAmount.toStringAsFixed(0)}',
+                style: textTheme.bodySmall?.copyWith(
+                  color: tokens.mutedForeground,
+                ),
+              ),
+              const SizedBox(width: 4),
+              const XpIcon(size: 12),
+            ],
+          ),
+        ],
+      ],
     );
   }
 }

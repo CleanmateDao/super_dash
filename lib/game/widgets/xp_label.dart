@@ -1,0 +1,45 @@
+import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/game/bloc/game_bloc.dart';
+import 'package:cleanmate_rush/utils/utils.dart';
+import 'package:cleanmate_rush/widgets/xp_icon.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+class XpLabel extends StatelessWidget {
+  const XpLabel({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final tokens = context.appTheme;
+    final xp = context.select(
+      (GameBloc bloc) => bloc.state.xp,
+    );
+
+    return SafeArea(
+      child: TraslucentBackground(
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(
+          color: tokens.border,
+        ),
+        gradient: tokens.cardGradient.colors,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            children: [
+              const XpIcon(size: 40),
+              const SizedBox(width: 10),
+              Text(
+                formatXp(xp),
+                style: textTheme.titleLarge?.copyWith(
+                  color: tokens.foreground,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

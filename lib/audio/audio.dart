@@ -5,11 +5,10 @@
 import 'dart:collection';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/foundation.dart';
+import 'package:cleanmate_rush/audio/songs.dart';
+import 'package:cleanmate_rush/settings/settings_controller.dart';
 import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
-import 'package:super_dash/audio/songs.dart';
-import 'package:super_dash/settings/settings_controller.dart';
 
 typedef CreateAudioPlayer = AudioPlayer Function({required String playerId});
 
@@ -67,6 +66,7 @@ class AudioController {
   int _currentSfxPlayer = 0;
 
   final Queue<Song> _playlist;
+  var _musicRequested = false;
 
   SettingsController? _settings;
 
@@ -108,11 +108,6 @@ class AudioController {
     settingsController.muted.addListener(_mutedHandler);
     settingsController.musicOn.addListener(_musicOnHandler);
     settingsController.soundsOn.addListener(_soundsOnHandler);
-
-    if (!kIsWeb &&
-        (!settingsController.muted.value && settingsController.musicOn.value)) {
-      startMusic();
-    }
   }
 
   bool get isMusicEnabled =>
@@ -170,7 +165,9 @@ class AudioController {
     // Put the song that just finished playing to the end of the playlist.
     _playlist.addLast(_playlist.removeFirst());
     // Play the next song.
-    _playFirstSongInPlaylist();
+    if (_musicRequested && isMusicEnabled) {
+      _playFirstSongInPlaylist();
+    }
   }
 
   void _handleAppLifecycle() {
@@ -179,7 +176,9 @@ class AudioController {
       case AppLifecycleState.detached:
         _stopAllSound();
       case AppLifecycleState.resumed:
-        if (!_settings!.muted.value && _settings!.musicOn.value) {
+        if (_musicRequested &&
+            !_settings!.muted.value &&
+            _settings!.musicOn.value) {
           _resumeMusic();
         }
       case AppLifecycleState.inactive:
@@ -192,7 +191,7 @@ class AudioController {
   void _musicOnHandler() {
     if (_settings!.musicOn.value) {
       // Music got turned on.
-      if (!_settings!.muted.value) {
+      if (_musicRequested && !_settings!.muted.value) {
         _resumeMusic();
       }
     } else {
@@ -207,7 +206,7 @@ class AudioController {
       _stopAllSound();
     } else {
       // All sound just got un-muted.
-      if (_settings!.musicOn.value) {
+      if (_musicRequested && _settings!.musicOn.value) {
         _resumeMusic();
       }
     }
@@ -263,10 +262,21 @@ class AudioController {
   }
 
   void startMusic() {
+    _musicRequested = true;
+    if (!isMusicEnabled) {
+      _log.info('Music requested but disabled by user settings.');
+      return;
+    }
+
     if (_musicPlayer.state != PlayerState.playing) {
       _log.info('starting music');
       _playFirstSongInPlaylist();
     }
+  }
+
+  void stopMusic() {
+    _musicRequested = false;
+    _stopMusic();
   }
 
   void _stopAllSound() {

@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:cleanmate_rush/audio/audio.dart';
+import 'package:cleanmate_rush/game/game.dart';
 import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
 import 'package:flame_test/flame_test.dart';
@@ -8,8 +10,6 @@ import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:leap/leap.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:super_dash/audio/audio.dart';
-import 'package:super_dash/game/game.dart';
 
 class _MockImage extends Mock implements Image {}
 
@@ -26,8 +26,8 @@ class _MockLeapMap extends Mock implements LeapMap {}
 
 class _MockObjectGroup extends Mock implements ObjectGroup {}
 
-class _TestSuperDashGame extends SuperDashGame {
-  _TestSuperDashGame({this.layerObjects = const []})
+class _TestCleanmateRushGame extends CleanmateRushGame {
+  _TestCleanmateRushGame({this.layerObjects = const []})
       : super(
           gameBloc: _MockGameBloc(),
           audioController: _MockAudioController(),
@@ -95,7 +95,7 @@ void main() {
     ];
     testWithGame(
       'can be added to a game',
-      _TestSuperDashGame.new,
+      _TestCleanmateRushGame.new,
       (game) async {
         final reference = _ReferenceComponent();
         await game.world.ensureAdd(reference);
@@ -116,7 +116,7 @@ void main() {
 
     testWithGame(
       'spawn an object when the reference is far enough',
-      () => _TestSuperDashGame(layerObjects: objects),
+      () => _TestCleanmateRushGame(layerObjects: objects),
       (game) async {
         final reference = _ReferenceComponent();
         await game.world.ensureAdd(reference);
@@ -142,7 +142,7 @@ void main() {
 
     testWithGame(
       "doesn't spanw the component again",
-      () => _TestSuperDashGame(layerObjects: objects),
+      () => _TestCleanmateRushGame(layerObjects: objects),
       (game) async {
         final reference = _ReferenceComponent();
         await game.world.ensureAdd(reference);

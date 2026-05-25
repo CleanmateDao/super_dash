@@ -1,9 +1,11 @@
+import 'package:app_ui/app_ui.dart';
+import 'package:cleanmate_rush/audio/audio.dart';
+import 'package:cleanmate_rush/game/game.dart';
+import 'package:cleanmate_rush/game_intro/game_intro.dart';
+import 'package:cleanmate_rush/score/score.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:super_dash/audio/audio.dart';
-import 'package:super_dash/game/game.dart';
-import 'package:super_dash/game_intro/game_intro.dart';
 
 class Game extends StatelessWidget {
   const Game({super.key});
@@ -23,6 +25,15 @@ class Game extends StatelessWidget {
   }
 }
 
+void _showGameEndScreen(BuildContext context, double xp) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (!context.mounted) {
+      return;
+    }
+    Navigator.of(context).push(ScorePage.route(xp: xp));
+  });
+}
+
 class GameView extends StatelessWidget {
   const GameView({super.key});
 
@@ -35,22 +46,29 @@ class GameView extends StatelessWidget {
           GameWidget.controlled(
             loadingBuilder: (context) => const GameBackground(),
             backgroundBuilder: (context) => const GameBackground(),
-            gameFactory: () => SuperDashGame(
+            gameFactory: () => CleanmateRushGame(
               gameBloc: context.read<GameBloc>(),
               audioController: context.read<AudioController>(),
+              onRunEnded: (xp) => _showGameEndScreen(context, xp),
             ),
             overlayBuilderMap: {
               'tapToJump': (context, game) => const TapToJumpOverlay(),
             },
             initialActiveOverlays: const ['tapToJump'],
           ),
-          const Positioned(
+          Positioned(
             top: 12,
-            child: ScoreLabel(),
+            left: ResponsiveInsets.page(context).left,
+            right: ResponsiveInsets.page(context).right,
+            child: const Center(child: XpLabel()),
           ),
-          const Positioned(
+          Positioned(
             bottom: 12,
-            child: SafeArea(child: AudioButton()),
+            left: ResponsiveInsets.page(context).left,
+            right: ResponsiveInsets.page(context).right,
+            child: const SafeArea(
+              child: Center(child: AudioButton()),
+            ),
           ),
         ],
       ),

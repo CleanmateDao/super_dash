@@ -1,17 +1,16 @@
 import 'dart:async';
 
 import 'package:authentication_repository/authentication_repository.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cleanmate_rush/app/app.dart';
+import 'package:cleanmate_rush/audio/audio.dart';
+import 'package:cleanmate_rush/bootstrap.dart';
+import 'package:cleanmate_rush/firebase_options_dev.dart';
+import 'package:cleanmate_rush/settings/persistence/persistence.dart';
+import 'package:cleanmate_rush/settings/settings.dart';
+import 'package:cleanmate_rush/share/share.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
 import 'package:leaderboard_repository/leaderboard_repository.dart';
-import 'package:super_dash/app/app.dart';
-import 'package:super_dash/audio/audio.dart';
-import 'package:super_dash/bootstrap.dart';
-import 'package:super_dash/firebase_options_dev.dart';
-import 'package:super_dash/settings/persistence/persistence.dart';
-import 'package:super_dash/settings/settings.dart';
-import 'package:super_dash/share/share.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +22,7 @@ void main() async {
   final settings = SettingsController(
     persistence: LocalStorageSettingsPersistence(),
   );
+  await settings.loadStateFromPersistence();
 
   final audio = AudioController()..attachSettings(settings);
 
@@ -32,9 +32,7 @@ void main() async {
     gameUrl: 'https://endless-runner-9481713-383737.web.app/',
   );
 
-  final leaderboardRepository = LeaderboardRepository(
-    FirebaseFirestore.instance,
-  );
+  final leaderboardRepository = LeaderboardRepository();
 
   unawaited(
     bootstrap(

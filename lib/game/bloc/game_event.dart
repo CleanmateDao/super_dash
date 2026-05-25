@@ -7,22 +7,13 @@ abstract class GameEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-final class GameScoreIncreased extends GameEvent {
-  const GameScoreIncreased({this.by = 1});
+final class GameXpEarned extends GameEvent {
+  const GameXpEarned({required this.amount});
 
-  final int by;
-
-  @override
-  List<Object> get props => [by];
-}
-
-final class GameScoreDecreased extends GameEvent {
-  const GameScoreDecreased({this.by = 1});
-
-  final int by;
+  final double amount;
 
   @override
-  List<Object> get props => [by];
+  List<Object> get props => [amount];
 }
 
 final class GameOver extends GameEvent {

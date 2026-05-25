@@ -1,12 +1,12 @@
 // ignore_for_file: cascade_invocations
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:cleanmate_rush/audio/audio.dart';
+import 'package:cleanmate_rush/game/game.dart';
 import 'package:flame/components.dart';
 import 'package:flame_test/flame_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:super_dash/audio/audio.dart';
-import 'package:super_dash/game/game.dart';
 
 class _MockGameBloc extends MockBloc<GameEvent, GameState>
     implements GameBloc {}
@@ -16,7 +16,7 @@ class _MockAudioController extends Mock implements AudioController {}
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('SuperDashGame', () {
+  group('CleanmateRushGame', () {
     late GameBloc gameBloc;
     late AudioController audioController;
 
@@ -27,8 +27,8 @@ void main() {
       when(() => gameBloc.state).thenReturn(const GameState.initial());
     });
 
-    SuperDashGame createGame() {
-      return SuperDashGame(
+    CleanmateRushGame createGame() {
+      return CleanmateRushGame(
         gameBloc: gameBloc,
         audioController: audioController,
       );
@@ -37,13 +37,13 @@ void main() {
     final flameTester = FlameTester(createGame);
 
     flameTester.testGameWidget(
-      'starts with score 0',
+      'starts with xp 0',
       setUp: (game, tester) async {
         when(() => game.gameBloc.state).thenReturn(const GameState.initial());
         await game.ready();
       },
       verify: (game, tester) async => expect(
-        game.gameBloc.state.score,
+        game.gameBloc.state.xp,
         isZero,
       ),
     );

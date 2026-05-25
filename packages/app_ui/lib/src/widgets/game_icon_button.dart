@@ -1,8 +1,9 @@
+import 'package:app_ui/src/theme/theme.dart';
 import 'package:app_ui/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 /// {@template game_icon_button}
-/// Common icon button for the screens in the game.
+/// Icon button using the React `outline` / `secondary` surface style.
 /// {@endtemplate}
 class GameIconButton extends StatelessWidget {
   /// {@macro game_icon_button}
@@ -14,15 +15,29 @@ class GameIconButton extends StatelessWidget {
     this.size,
     this.alignment,
     super.key,
-  });
+  }) : customIcon = null;
+
+  /// {@macro game_icon_button}
+  const GameIconButton.custom({
+    required this.customIcon,
+    this.onPressed,
+    this.gradient,
+    this.border,
+    this.size,
+    this.alignment,
+    super.key,
+  }) : icon = null;
 
   /// The icon to display.
-  final IconData icon;
+  final IconData? icon;
+
+  /// The custom icon widget to display.
+  final Widget? customIcon;
 
   /// The callback when the button is pressed.
   final VoidCallback? onPressed;
 
-  /// The colors gradient to use for the button.
+  /// Optional gradient override (defaults to secondary surface).
   final List<Color>? gradient;
 
   /// The border to use for the button.
@@ -34,34 +49,30 @@ class GameIconButton extends StatelessWidget {
   /// The alignment of the icon.
   final Alignment? alignment;
 
-  static const _defaultGradient = LinearGradient(
-    colors: [
-      Color(0xFFB1B1B1),
-      Color(0xFF363567),
-    ],
-  );
-
-  static final _defaultBorder = Border.all(
-    color: Colors.white,
-  );
-
   @override
   Widget build(BuildContext context) {
+    final tokens = context.appTheme;
+    final surface = tokens.secondary.withValues(alpha: 0.8);
+
     return TraslucentBackground(
-      gradient: gradient ?? _defaultGradient.colors,
-      border: border ?? _defaultBorder,
+      gradient: gradient ?? [surface, surface],
+      border: border ?? Border.all(color: tokens.border),
+      shape: BoxShape.rectangle,
+      borderRadius: AppRadii.buttonBorder,
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(100),
+        borderRadius: AppRadii.buttonBorder,
         child: Container(
-          width: 52,
-          height: 52,
-          padding: const EdgeInsets.all(14),
+          width: 40,
+          height: 40,
+          padding: const EdgeInsets.all(8),
           alignment: alignment ?? Alignment.center,
-          child: Icon(
-            icon,
-            size: size ?? 24,
-            color: Colors.white,
+          child: IconTheme(
+            data: IconThemeData(
+              size: size ?? 20,
+              color: tokens.foreground,
+            ),
+            child: customIcon ?? Icon(icon),
           ),
         ),
       ),

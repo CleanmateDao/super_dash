@@ -1,3 +1,4 @@
+import 'package:cleanmate_rush/game/game.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
@@ -6,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:super_dash/game/game.dart';
 
 class _TestGame extends FlameGame with HasKeyboardHandlerComponents {}
 
