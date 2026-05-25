@@ -26,7 +26,12 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     GameOver event,
     Emitter<GameState> emit,
   ) {
-    emit(const GameState.initial());
+    emit(
+      state.copyWith(
+        xp: 0,
+        currentSection: 0,
+      ),
+    );
   }
 
   void _onGameSectionCompleted(

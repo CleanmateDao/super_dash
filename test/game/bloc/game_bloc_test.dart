@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('GameBloc', () {
     blocTest<GameBloc, GameState>(
-      'emits GameState initial when GameOver is added',
+      'clears xp and resets section when GameOver is added',
       build: GameBloc.new,
       seed: () => const GameState(
         xp: 0.015,
@@ -16,7 +16,29 @@ void main() {
         currentSection: 2,
       ),
       act: (bloc) => bloc.add(GameOver()),
-      expect: () => const [GameState.initial()],
+      expect: () => const [
+        GameState(
+          xp: 0,
+          currentLevel: 2,
+          currentSection: 0,
+        ),
+      ],
+    );
+
+    blocTest<GameBloc, GameState>(
+      'advances level when the last section is completed',
+      build: GameBloc.new,
+      seed: () => const GameState(
+        currentLevel: 1,
+        currentSection: 2,
+      ),
+      act: (bloc) => bloc.add(const GameSectionCompleted(sectionCount: 3)),
+      expect: () => const [
+        GameState(
+          currentLevel: 2,
+          currentSection: 0,
+        ),
+      ],
     );
 
     blocTest<GameBloc, GameState>(

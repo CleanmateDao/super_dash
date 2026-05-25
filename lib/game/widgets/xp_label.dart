@@ -17,27 +17,32 @@ class XpLabel extends StatelessWidget {
     );
 
     return SafeArea(
-      child: TraslucentBackground(
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(
-          color: tokens.border,
-        ),
-        gradient: tokens.cardGradient.colors,
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Row(
-            children: [
-              const XpIcon(size: 16),
-              const SizedBox(width: 8),
-              Text(
-                formatXp(xp),
-                style: textTheme.bodyMedium?.copyWith(
-                  color: tokens.foreground,
-                  fontWeight: AppFontWeights.semibold,
+      child: SizedBox(
+        width: double.infinity,
+        child: TraslucentBackground(
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(
+            color: tokens.border,
+          ),
+          gradient: tokens.cardGradient.colors,
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                const XpIcon(size: 16),
+                const SizedBox(width: 8),
+                Text(
+                  formatXp(xp),
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: tokens.foreground,
+                    fontWeight: AppFontWeights.semibold,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

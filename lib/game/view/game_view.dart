@@ -101,7 +101,7 @@ class _GameViewState extends State<GameView> {
             top: 12,
             left: ResponsiveInsets.page(context).left,
             right: ResponsiveInsets.page(context).right,
-            child: const Center(child: XpLabel()),
+            child: const XpLabel(),
           ),
           Positioned(
             bottom: 12,

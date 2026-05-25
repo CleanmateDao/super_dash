@@ -420,14 +420,15 @@ class CleanmateRushGame extends LeapGame
   }
 
   void sectionCleared() {
-    if (isLastSection) {
-      player?.spritePaintColor(Colors.transparent);
-      player?.walking = false;
-      gameOver();
+    if (_isAdvancingSection || _hasEndedRun) {
       return;
     }
 
-    if (_isAdvancingSection || _hasEndedRun) {
+    if (isLastSection) {
+      player?.spritePaintColor(Colors.transparent);
+      player?.walking = false;
+      gameBloc.add(GameSectionCompleted(sectionCount: _sections.length));
+      gameOver();
       return;
     }
 
@@ -441,14 +442,23 @@ class CleanmateRushGame extends LeapGame
 
     _isAdvancingSection = true;
     final completedSection = state.currentSection;
+    final nextSectionIndex = completedSection + 1;
 
-    gameBloc.add(GameSectionCompleted(sectionCount: _sections.length));
-    final nextSectionIndex = state.currentSection;
+    if (nextSectionIndex >= _sections.length) {
+      _isAdvancingSection = false;
+      return;
+    }
 
     try {
       await _loadNewSection(nextSectionIndex);
+      gameBloc.add(GameSectionCompleted(sectionCount: _sections.length));
+      _setSectionBackground();
     } on Exception {
-      player?.isPlayerTeleporting = false;
+      try {
+        await _loadNewSection(completedSection);
+      } on Exception {
+        // Leave the run in a broken state if recovery also fails.
+      }
       return;
     } finally {
       _isAdvancingSection = false;
