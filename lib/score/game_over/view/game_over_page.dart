@@ -125,9 +125,7 @@ class GameOverPage extends StatelessWidget {
                               source: 'game_over',
                             ),
                       );
-                      context
-                          .read<ScoreBloc>()
-                          .add(const ScorePlayAgainRequested());
+                      completePlayAgainFlow(context);
                     },
                     gradient: tokens.blueGradient,
                   ),

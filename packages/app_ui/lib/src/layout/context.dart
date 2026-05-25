@@ -38,8 +38,7 @@ extension BuildContextLayoutX on BuildContext {
 
   /// Width below Tailwind `md` (768px).
   bool get isSmall {
-    final isNarrow =
-        MediaQuery.sizeOf(this).width < AppBreakpoints.small.size;
+    final isNarrow = MediaQuery.sizeOf(this).width < AppBreakpoints.small.size;
     if (kIsWeb) {
       return isNarrow;
     }
@@ -47,8 +46,7 @@ extension BuildContextLayoutX on BuildContext {
   }
 
   /// Tablet range (640px–1023px).
-  bool get isTablet =>
-      screenLayout == ScreenLayout.medium;
+  bool get isTablet => screenLayout == ScreenLayout.medium;
 
   /// Width at or above Tailwind `lg` (1024px).
   bool get isLarge =>
@@ -163,9 +161,9 @@ abstract final class ResponsiveInsets {
     };
     final width = maxWidth.clamp(300.0, size.width - horizontalGutter);
     final maxHeight = switch (context.screenLayout) {
-      ScreenLayout.compact => size.height * 0.66,
-      ScreenLayout.medium => size.height * 0.70,
-      _ => size.height * 0.74,
+      ScreenLayout.compact => size.height * 0.70,
+      ScreenLayout.medium => size.height * 0.80,
+      _ => size.height * 0.85,
     };
     final height = maxHeight.clamp(440.0, 720.0);
     return Size(width.toDouble(), height.toDouble());

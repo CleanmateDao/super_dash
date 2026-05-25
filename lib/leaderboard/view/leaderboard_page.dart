@@ -111,9 +111,7 @@ class LeaderboardView extends StatelessWidget {
                                 source: 'leaderboard',
                               ),
                         );
-                        context
-                            .read<ScoreBloc>()
-                            .add(const ScorePlayAgainRequested());
+                        completePlayAgainFlow(context);
                       },
                       gradient: tokens.blueGradient,
                     ),

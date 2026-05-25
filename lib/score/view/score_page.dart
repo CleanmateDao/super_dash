@@ -5,6 +5,13 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+/// Completes the score flow and signals [GameView] to restart the run.
+void completePlayAgainFlow(BuildContext context) {
+  context.flow<ScoreState>().complete(
+    (state) => state.copyWith(playAgainRequested: true),
+  );
+}
+
 class ScorePage extends StatelessWidget {
   const ScorePage({
     required this.xp,
@@ -36,19 +43,12 @@ class ScoreView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ScoreBloc, ScoreState>(
-      listenWhen: (previous, current) =>
-          !previous.playAgainRequested && current.playAgainRequested,
-      listener: (context, state) {
-        context.flow<ScoreState>().complete();
+    return FlowBuilder<ScoreState>(
+      state: context.select((ScoreBloc bloc) => bloc.state),
+      onGeneratePages: onGenerateScorePages,
+      onComplete: (state) {
+        Navigator.of(context, rootNavigator: true).pop(state.playAgainRequested);
       },
-      child: FlowBuilder<ScoreState>(
-        state: context.select((ScoreBloc bloc) => bloc.state),
-        onGeneratePages: onGenerateScorePages,
-        onComplete: (state) {
-          Navigator.of(context).pop(state.playAgainRequested);
-        },
-      ),
     );
   }
 }
