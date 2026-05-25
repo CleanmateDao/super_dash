@@ -13,4 +13,34 @@ void main() {
       ),
     );
   });
+
+  group('LeaderboardWeeklyRequested', () {
+    test(
+      'supports value equality',
+      () => expect(
+        const LeaderboardWeeklyRequested(weeksAgo: 2),
+        const LeaderboardWeeklyRequested(weeksAgo: 2),
+      ),
+    );
+  });
+
+  group('LeaderboardPreviousWeekRequested', () {
+    test(
+      'supports value equality',
+      () => expect(
+        const LeaderboardPreviousWeekRequested(),
+        const LeaderboardPreviousWeekRequested(),
+      ),
+    );
+  });
+
+  group('LeaderboardNextWeekRequested', () {
+    test(
+      'supports value equality',
+      () => expect(
+        const LeaderboardNextWeekRequested(),
+        const LeaderboardNextWeekRequested(),
+      ),
+    );
+  });
 }

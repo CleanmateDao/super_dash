@@ -154,20 +154,20 @@ abstract final class ResponsiveInsets {
   /// Leaderboard panel size inside [PageWithBackground].
   static Size leaderboardPanelSize(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    final horizontalGutter = page(context).horizontal * 2 + 32;
+    final horizontalGutter = page(context).horizontal * 2 + 16;
     final maxWidth = switch (context.screenLayout) {
       ScreenLayout.compact => size.width - horizontalGutter,
-      ScreenLayout.medium => 440,
-      ScreenLayout.large => 480,
-      ScreenLayout.extraLarge => 520,
+      ScreenLayout.medium => 600,
+      ScreenLayout.large => 760,
+      ScreenLayout.extraLarge => 896,
     };
-    final width = maxWidth.clamp(280.0, size.width - horizontalGutter);
+    final width = maxWidth.clamp(300.0, size.width - horizontalGutter);
     final maxHeight = switch (context.screenLayout) {
-      ScreenLayout.compact => size.height * 0.58,
-      ScreenLayout.medium => size.height * 0.62,
-      _ => size.height * 0.65,
+      ScreenLayout.compact => size.height * 0.66,
+      ScreenLayout.medium => size.height * 0.70,
+      _ => size.height * 0.74,
     };
-    final height = maxHeight.clamp(360.0, 560.0);
+    final height = maxHeight.clamp(440.0, 720.0);
     return Size(width.toDouble(), height.toDouble());
   }
 

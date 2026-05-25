@@ -312,6 +312,16 @@ class _LeaderboardPeriodHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final tokens = context.appTheme;
+    final weeksAgo = context.select(
+      (LeaderboardBloc bloc) => bloc.state.weeksAgo,
+    );
+    final isLoading = context.select(
+      (LeaderboardBloc bloc) => bloc.state is LeaderboardLoading,
+    );
+    final canGoToPreviousWeek = weeksAgo > 0 && !isLoading;
+    final canGoToOlderWeek =
+        weeksAgo < leaderboardMaxWeeksAgo && !isLoading;
+
     return DecoratedBox(
       decoration: BoxDecoration(
         color: tokens.card,
@@ -325,14 +335,18 @@ class _LeaderboardPeriodHeader extends StatelessWidget {
           children: [
             _PeriodButton(
               icon: Icons.chevron_left_outlined,
-              onPressed: () {},
+              onPressed: canGoToPreviousWeek
+                  ? () => context
+                      .read<LeaderboardBloc>()
+                      .add(const LeaderboardPreviousWeekRequested())
+                  : null,
             ),
             Expanded(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'This week',
+                    formatLeaderboardWeekLabel(weeksAgo),
                     style: textTheme.bodyMedium?.copyWith(
                       color: tokens.foreground,
                       fontWeight: FontWeight.w800,
@@ -350,7 +364,11 @@ class _LeaderboardPeriodHeader extends StatelessWidget {
             ),
             _PeriodButton(
               icon: Icons.chevron_right_outlined,
-              onPressed: () {},
+              onPressed: canGoToOlderWeek
+                  ? () => context
+                      .read<LeaderboardBloc>()
+                      .add(const LeaderboardNextWeekRequested())
+                  : null,
             ),
           ],
         ),
@@ -366,7 +384,7 @@ class _PeriodButton extends StatelessWidget {
   });
 
   final IconData icon;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {

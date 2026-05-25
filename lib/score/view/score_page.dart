@@ -40,11 +40,14 @@ class ScoreView extends StatelessWidget {
       listenWhen: (previous, current) =>
           !previous.playAgainRequested && current.playAgainRequested,
       listener: (context, state) {
-        Navigator.of(context).pop(true);
+        context.flow<ScoreState>().complete();
       },
       child: FlowBuilder<ScoreState>(
         state: context.select((ScoreBloc bloc) => bloc.state),
         onGeneratePages: onGenerateScorePages,
+        onComplete: (state) {
+          Navigator.of(context).pop(state.playAgainRequested);
+        },
       ),
     );
   }

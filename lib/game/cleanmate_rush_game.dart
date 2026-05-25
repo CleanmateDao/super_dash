@@ -76,6 +76,7 @@ class CleanmateRushGame extends LeapGame
 
   var _hasEndedRun = false;
   var _loggedFirstInput = false;
+  Completer<void>? _gameOverCompleter;
 
   GameState get state => gameBloc.state;
 
@@ -226,18 +227,24 @@ class CleanmateRushGame extends LeapGame
   }
 
   Future<void> _completeGameOver(double xp) async {
-    pauseEngine();
-    overlays.remove('tapToJump');
+    _gameOverCompleter = Completer<void>();
+    try {
+      pauseEngine();
+      overlays.remove('tapToJump');
 
-    unawaited(_postGameplayXp(xp));
+      unawaited(_postGameplayXp(xp));
 
-    gameBloc.add(const GameOver());
+      gameBloc.add(const GameOver());
 
-    world.firstChild<Player>()?.removeFromParent();
-    _resetEntities();
+      world.firstChild<Player>()?.removeFromParent();
+      _resetEntities();
 
-    if (onRunEnded == null) {
-      unawaited(restartRun());
+      if (onRunEnded == null) {
+        unawaited(restartRun());
+      }
+    } finally {
+      _gameOverCompleter?.complete();
+      _gameOverCompleter = null;
     }
   }
 
@@ -245,6 +252,13 @@ class CleanmateRushGame extends LeapGame
     if (!_hasEndedRun) {
       return;
     }
+
+    final gameOverCompleter = _gameOverCompleter;
+    if (gameOverCompleter != null) {
+      await gameOverCompleter.future;
+    }
+
+    gameBloc.add(const GameOver());
 
     await loadWorldAndMap(
       images: images,
@@ -394,12 +408,23 @@ class CleanmateRushGame extends LeapGame
       return;
     }
 
-    _loadNewSection();
+    unawaited(_advanceToNextSection());
+  }
+
+  Future<void> _advanceToNextSection() async {
+    final completedSection = state.currentSection;
+
+    try {
+      await _loadNewSection();
+    } on Exception {
+      player?.isPlayerTeleporting = false;
+      return;
+    }
 
     gameBloc.add(GameSectionCompleted(sectionCount: _sections.length));
     unawaited(
       rushAnalytics.logSectionCompleted(
-        sectionIndex: state.currentSection,
+        sectionIndex: completedSection,
         level: state.currentLevel,
       ),
     );

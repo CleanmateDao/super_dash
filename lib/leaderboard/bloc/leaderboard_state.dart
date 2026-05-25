@@ -1,29 +1,34 @@
 part of 'leaderboard_bloc.dart';
 
 sealed class LeaderboardState extends Equatable {
-  const LeaderboardState();
+  const LeaderboardState({this.weeksAgo = 0});
+
+  final int weeksAgo;
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [weeksAgo];
 }
 
 final class LeaderboardInitial extends LeaderboardState {
-  const LeaderboardInitial();
+  const LeaderboardInitial({super.weeksAgo});
 }
 
 final class LeaderboardLoading extends LeaderboardState {
-  const LeaderboardLoading();
+  const LeaderboardLoading({super.weeksAgo});
 }
 
 final class LeaderboardLoaded extends LeaderboardState {
-  const LeaderboardLoaded({required this.entries});
+  const LeaderboardLoaded({
+    required this.entries,
+    super.weeksAgo,
+  });
 
   final List<LeaderboardEntryData> entries;
 
   @override
-  List<Object> get props => [entries];
+  List<Object> get props => [entries, weeksAgo];
 }
 
 final class LeaderboardError extends LeaderboardState {
-  const LeaderboardError();
+  const LeaderboardError({super.weeksAgo});
 }
