@@ -26,7 +26,7 @@ class TapToJumpOverlay extends StatelessWidget {
               l10n.tapToStart,
               style: textTheme.bodyMedium?.copyWith(
                 color: tokens.foreground,
-                fontWeight: FontWeight.w700,
+                fontWeight: AppFontWeights.medium,
               ),
             ),
           ),

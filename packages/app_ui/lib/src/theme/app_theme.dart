@@ -62,7 +62,7 @@ abstract final class AppTheme {
         style: TextButton.styleFrom(
           foregroundColor: tokens.primary,
           textStyle: textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w500,
+            fontWeight: AppFontWeights.medium,
           ),
         ),
       ),
@@ -76,7 +76,7 @@ abstract final class AppTheme {
             borderRadius: AppRadii.buttonBorder,
           ),
           textStyle: textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w500,
+            fontWeight: AppFontWeights.medium,
           ),
         ),
       ),
@@ -89,7 +89,7 @@ abstract final class AppTheme {
             borderRadius: AppRadii.buttonBorder,
           ),
           textStyle: textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w500,
+            fontWeight: AppFontWeights.medium,
           ),
         ),
       ),

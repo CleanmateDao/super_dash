@@ -72,7 +72,7 @@ class GameElevatedButton extends StatelessWidget {
               textStyle: theme.textTheme.labelLarge?.copyWith(
                 color: labelColor,
                 fontSize: 14,
-                fontWeight: FontWeight.w500,
+                fontWeight: AppFontWeights.medium,
                 height: 1.2,
               ),
             ),

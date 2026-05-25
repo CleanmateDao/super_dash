@@ -34,7 +34,7 @@ class XpLabel extends StatelessWidget {
                 formatXp(xp),
                 style: textTheme.bodyMedium?.copyWith(
                   color: tokens.foreground,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: AppFontWeights.semibold,
                 ),
               ),
             ],

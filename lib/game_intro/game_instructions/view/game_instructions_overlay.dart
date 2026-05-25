@@ -184,7 +184,6 @@ class _CardContent extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: tokens.foreground,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 8),

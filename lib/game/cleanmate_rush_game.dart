@@ -76,6 +76,7 @@ class CleanmateRushGame extends LeapGame
 
   var _hasEndedRun = false;
   var _loggedFirstInput = false;
+  var _isAdvancingSection = false;
   Completer<void>? _gameOverCompleter;
 
   GameState get state => gameBloc.state;
@@ -358,28 +359,34 @@ class CleanmateRushGame extends LeapGame
     ]);
   }
 
-  Future<void> _loadNewSection() async {
-    final nextSectionIndex = state.currentSection + 1 < _sections.length
-        ? state.currentSection + 1
-        : 0;
-
-    final nextSection = _sections[nextSectionIndex];
-
+  Future<void> _loadNewSection(int sectionIndex) async {
     _resetEntities();
+    world.firstChild<Player>()?.removeFromParent();
 
     await loadWorldAndMap(
       images: images,
       prefix: prefix,
-      tiledMapPath: nextSection,
+      tiledMapPath: _sections[sectionIndex],
     );
 
-    if (isFirstSection) {
+    if (sectionIndex == 0) {
       _addTreeHouseSign();
     }
 
-    if (isLastSection || isFirstSection) {
+    if (sectionIndex == 0 || sectionIndex == _sections.length - 1) {
       _addTreeHouseFrontLayer();
     }
+
+    final newPlayer = Player(
+      levelSize: leapMap.tiledMap.size.clone(),
+      cameraViewport: _cameraViewport,
+    );
+    await world.add(newPlayer);
+    await newPlayer.mounted;
+    newPlayer
+      ..walking = true
+      ..spritePaintColor(Colors.white)
+      ..isPlayerTeleporting = false;
 
     await _addSpawners();
   }
@@ -408,20 +415,33 @@ class CleanmateRushGame extends LeapGame
       return;
     }
 
+    if (_isAdvancingSection || _hasEndedRun) {
+      return;
+    }
+
     unawaited(_advanceToNextSection());
   }
 
   Future<void> _advanceToNextSection() async {
-    final completedSection = state.currentSection;
-
-    try {
-      await _loadNewSection();
-    } on Exception {
-      player?.isPlayerTeleporting = false;
+    if (_isAdvancingSection || _hasEndedRun) {
       return;
     }
 
+    _isAdvancingSection = true;
+    final completedSection = state.currentSection;
+
     gameBloc.add(GameSectionCompleted(sectionCount: _sections.length));
+    final nextSectionIndex = state.currentSection;
+
+    try {
+      await _loadNewSection(nextSectionIndex);
+    } on Exception {
+      player?.isPlayerTeleporting = false;
+      return;
+    } finally {
+      _isAdvancingSection = false;
+    }
+
     unawaited(
       rushAnalytics.logSectionCompleted(
         sectionIndex: completedSection,

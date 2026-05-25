@@ -33,7 +33,7 @@ class GameInfoDialog extends StatelessWidget {
       color: tokens.primary,
       decoration: TextDecoration.underline,
       decorationColor: tokens.primary,
-      fontWeight: FontWeight.w700,
+      fontWeight: AppFontWeights.medium,
     );
     return AppDialog(
       backgroundColor: tokens.card,
@@ -58,7 +58,6 @@ class GameInfoDialog extends StatelessWidget {
                   l10n.aboutCleanmateRush,
                   style: textTheme.titleMedium?.copyWith(
                     color: tokens.foreground,
-                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 16),

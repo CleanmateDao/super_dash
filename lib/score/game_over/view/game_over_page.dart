@@ -68,7 +68,6 @@ class GameOverPage extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: textTheme.titleMedium?.copyWith(
                             color: titleColor,
-                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -87,7 +86,6 @@ class GameOverPage extends StatelessWidget {
                     l10n.totalXp,
                     style: textTheme.bodyMedium?.copyWith(
                       color: tokens.mutedForeground,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -168,7 +166,7 @@ class _XpWidget extends StatelessWidget {
             formatXp(xp),
             style: textTheme.bodyMedium?.copyWith(
               color: tokens.foreground,
-              fontWeight: FontWeight.w700,
+              fontWeight: AppFontWeights.semibold,
             ),
           ),
         ],

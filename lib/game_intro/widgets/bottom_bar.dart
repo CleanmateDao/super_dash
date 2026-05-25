@@ -35,7 +35,6 @@ class BottomBar extends StatelessWidget {
                       l10n.cleanmateRush,
                       style: theme.textTheme.titleSmall?.copyWith(
                         color: tokens.foreground,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -44,7 +43,7 @@ class BottomBar extends StatelessWidget {
                       text: TextSpan(
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: tokens.primary,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: AppFontWeights.medium,
                           decoration: TextDecoration.underline,
                           decorationColor: tokens.primary.withValues(alpha: 0.4),
                         ),

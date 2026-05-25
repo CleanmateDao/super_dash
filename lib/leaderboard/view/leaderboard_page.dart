@@ -248,7 +248,6 @@ class LeaderboardContent extends StatelessWidget {
                   'Showing ${entries.length} ranked',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: tokens.mutedForeground,
-                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -258,7 +257,7 @@ class LeaderboardContent extends StatelessWidget {
                     'RANKINGS',
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: tokens.mutedForeground,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: AppFontWeights.bold,
                       letterSpacing: 1.2,
                     ),
                   ),
@@ -347,7 +346,6 @@ class _LeaderboardPeriodHeader extends StatelessWidget {
                     formatLeaderboardWeekLabel(weeksAgo),
                     style: textTheme.bodyMedium?.copyWith(
                       color: tokens.foreground,
-                      fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -421,7 +419,7 @@ class _LeaderboardEntries extends StatelessWidget {
                 child: Text(
                   '${entry.rank ?? index + 1}',
                   style: textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
+                    fontWeight: AppFontWeights.bold,
                   ),
                 ),
               ),
@@ -436,7 +434,7 @@ class _LeaderboardEntries extends StatelessWidget {
                         entry.playerInitials,
                         overflow: TextOverflow.ellipsis,
                         style: textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: AppFontWeights.medium,
                         ),
                       )
                     : WalletUsernameText(
@@ -444,7 +442,7 @@ class _LeaderboardEntries extends StatelessWidget {
                         profileName: entry.profileName,
                         overflow: TextOverflow.ellipsis,
                         style: textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: AppFontWeights.medium,
                         ),
                       ),
               ),
@@ -487,7 +485,7 @@ class _LeaderboardEntryScore extends StatelessWidget {
             Text(
               entry.weekXp.toStringAsFixed(2),
               style: textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w700,
+                fontWeight: AppFontWeights.bold,
               ),
             ),
             const SizedBox(width: 3),

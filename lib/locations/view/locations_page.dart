@@ -160,7 +160,6 @@ class _LocationsView extends StatelessWidget {
                 'Locations',
                 style: theme.textTheme.headlineSmall?.copyWith(
                   color: tokens.foreground,
-                  fontWeight: FontWeight.w800,
                 ),
               ),
               const SizedBox(height: 16),
@@ -299,7 +298,6 @@ class _PlayerTopBar extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: textTheme.titleMedium?.copyWith(
                   color: tokens.foreground,
-                  fontWeight: FontWeight.w800,
                 ),
               ),
             ),
@@ -311,7 +309,7 @@ class _PlayerTopBar extends StatelessWidget {
                   formatXp(weekXp.toDouble()),
                   style: textTheme.titleMedium?.copyWith(
                     color: tokens.foreground,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: AppFontWeights.semibold,
                   ),
                 ),
                 const SizedBox(width: 4),
@@ -388,7 +386,6 @@ class _ProfileBottomSheet extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: textTheme.titleLarge?.copyWith(
                     color: tokens.foreground,
-                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -506,17 +503,17 @@ class _LocationCard extends StatelessWidget {
                       const Spacer(),
                       Text(
                         name,
-                        style: textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                        ),
+                  style: textTheme.titleLarge?.copyWith(
+                    color: Colors.white,
+                    fontWeight: AppFontWeights.semibold,
+                  ),
                       ),
                       const SizedBox(height: 6),
                       _RequirementLabel(
                         requirement: requirement,
                         style: textTheme.bodyMedium?.copyWith(
                           color: Colors.white.withValues(alpha: .86),
-                          fontWeight: FontWeight.w700,
+                          fontWeight: AppFontWeights.medium,
                         ),
                       ),
                     ],
@@ -587,7 +584,6 @@ class _UnlockDetailsSheet extends StatelessWidget {
                   'Unlock $locationName',
                   style: textTheme.titleLarge?.copyWith(
                     color: tokens.foreground,
-                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -650,7 +646,6 @@ class _UnlockRequirementTile extends StatelessWidget {
                             detail.title,
                             style: textTheme.titleSmall?.copyWith(
                               color: tokens.foreground,
-                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ),

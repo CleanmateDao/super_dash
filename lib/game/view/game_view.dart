@@ -53,7 +53,7 @@ class _GameViewState extends State<GameView> {
           section: gameState.currentSection,
         ),
       );
-      Navigator.of(context)
+      Navigator.of(context, rootNavigator: true)
           .push<bool>(ScorePage.route(xp: xp))
           .then((playAgain) {
         if (!mounted || playAgain != true) {

@@ -37,62 +37,62 @@ class AppTextStyles {
   /// Display large text style.
   static TextStyle get displayLarge => _commonStyle.copyWith(
         fontSize: 48,
-        fontWeight: FontWeight.w600,
+        fontWeight: AppFontWeights.semibold,
         letterSpacing: -1,
       );
 
   /// Display medium text style.
   static TextStyle get displayMedium => _commonStyle.copyWith(
         fontSize: 40,
-        fontWeight: FontWeight.w600,
+        fontWeight: AppFontWeights.semibold,
         letterSpacing: -.8,
       );
 
   /// Display small text style.
   static TextStyle get displaySmall => _commonStyle.copyWith(
         fontSize: 32,
-        fontWeight: FontWeight.w600,
+        fontWeight: AppFontWeights.semibold,
         letterSpacing: -.6,
       );
 
   /// Headline large text style.
   static TextStyle get headlineLarge => _commonStyle.copyWith(
         fontSize: 32,
-        fontWeight: FontWeight.w600,
+        fontWeight: AppFontWeights.semibold,
         letterSpacing: -.5,
       );
 
   /// Headline medium text style.
   static TextStyle get headlineMedium => _commonStyle.copyWith(
         fontSize: 28,
-        fontWeight: FontWeight.w600,
+        fontWeight: AppFontWeights.semibold,
         letterSpacing: -.4,
       );
 
   /// Headline small text style.
   static TextStyle get headlineSmall => _commonStyle.copyWith(
         fontSize: 24,
-        fontWeight: FontWeight.w600,
+        fontWeight: AppFontWeights.semibold,
         letterSpacing: -.3,
       );
 
   /// Title large text style.
   static TextStyle get titleLarge => _commonStyle.copyWith(
         fontSize: 22,
-        fontWeight: FontWeight.w600,
+        fontWeight: AppFontWeights.semibold,
         letterSpacing: -.2,
       );
 
   /// Title medium text style.
   static TextStyle get titleMedium => _commonStyle.copyWith(
         fontSize: 18,
-        fontWeight: FontWeight.w600,
+        fontWeight: AppFontWeights.semibold,
       );
 
   /// Title small text style.
   static TextStyle get titleSmall => _commonStyle.copyWith(
         fontSize: 16,
-        fontWeight: FontWeight.w600,
+        fontWeight: AppFontWeights.semibold,
       );
 
   /// Body large text style.
@@ -113,21 +113,33 @@ class AppTextStyles {
         height: 1.45,
       );
 
-  /// Label large text style.
+  /// Label large text style (`font-medium` in the React app).
   static TextStyle get labelLarge => _commonStyle.copyWith(
         fontSize: 14,
-        fontWeight: FontWeight.w600,
+        fontWeight: AppFontWeights.medium,
       );
 
-  /// Label medium text style.
+  /// Label medium text style (`font-medium` in the React app).
   static TextStyle get labelMedium => _commonStyle.copyWith(
         fontSize: 12,
-        fontWeight: FontWeight.w600,
+        fontWeight: AppFontWeights.medium,
       );
 
-  /// Label small text style.
+  /// Label small text style (`font-medium` in the React app).
   static TextStyle get labelSmall => _commonStyle.copyWith(
         fontSize: 11,
-        fontWeight: FontWeight.w600,
+        fontWeight: AppFontWeights.medium,
       );
+}
+
+/// Font weights aligned with Tailwind / the Cleanmate React app.
+abstract final class AppFontWeights {
+  /// `font-medium` (500)
+  static const FontWeight medium = FontWeight.w500;
+
+  /// `font-semibold` (600)
+  static const FontWeight semibold = FontWeight.w600;
+
+  /// `font-bold` (700)
+  static const FontWeight bold = FontWeight.w700;
 }

@@ -209,7 +209,7 @@ class _IntroPageState extends State<_IntroPage> {
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: tokens.mutedForeground,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: AppFontWeights.medium,
                         ),
                       ),
                     ],
@@ -342,7 +342,6 @@ class _LinkWalletSheetState extends State<_LinkWalletSheet> {
                     'Link Cleanmate account',
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: tokens.foreground,
-                      fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -351,7 +350,6 @@ class _LinkWalletSheetState extends State<_LinkWalletSheet> {
                     'Cleanmate Rush OTP.',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: tokens.mutedForeground,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 18),
@@ -392,7 +390,7 @@ class _LinkWalletSheetState extends State<_LinkWalletSheet> {
                       _errorMessage!,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: tokens.destructive,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: AppFontWeights.semibold,
                       ),
                     ),
                   ],
@@ -408,7 +406,6 @@ class _LinkWalletSheetState extends State<_LinkWalletSheet> {
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: tokens.mutedForeground,
-                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 8),
