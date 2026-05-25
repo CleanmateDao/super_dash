@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 class AppBlocObserver extends BlocObserver {
@@ -21,22 +21,16 @@ class AppBlocObserver extends BlocObserver {
   }
 }
 
-typedef BootstrapBuilder = FutureOr<Widget> Function(
-  FirebaseAuth firebaseAuth,
-);
+typedef BootstrapBuilder = FutureOr<Widget> Function();
 
 Future<void> bootstrap(BootstrapBuilder builder) async {
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
   };
 
-  Bloc.observer = const AppBlocObserver();
+  if (kDebugMode) {
+    Bloc.observer = const AppBlocObserver();
+  }
 
-  // Add cross-flavor configuration here
-
-  runApp(
-    await builder(
-      FirebaseAuth.instance,
-    ),
-  );
+  runApp(await builder());
 }

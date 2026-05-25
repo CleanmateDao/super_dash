@@ -16,10 +16,9 @@ A web platformer game built with Flutter and Flame.
 
 ## Getting Started 🚀
 
-This project contains 3 entry points (environments):
+This project contains 2 entry points (environments):
 
 - development — `lib/main_dev.dart`
-- staging — `lib/main_tester.dart`
 - production — `lib/main_prod.dart`
 
 Run in Chrome:
@@ -27,9 +26,6 @@ Run in Chrome:
 ```sh
 # Development
 flutter run -d chrome -t lib/main_dev.dart
-
-# Staging
-flutter run -d chrome -t lib/main_tester.dart
 
 # Production
 flutter run -d chrome -t lib/main_prod.dart
@@ -54,13 +50,10 @@ The app can be deployed to [Amplify Hosting](https://docs.aws.amazon.com/amplify
    | Branch | Entry point |
    |--------|-------------|
    | `main` (default) | `lib/main_dev.dart` |
-   | `staging` / `stage` | `lib/main_tester.dart` |
    | `production` / `prod` | `lib/main_prod.dart` |
 
 4. After the first deploy, add the Amplify URL (e.g. `https://main.d1234.amplifyapp.com`) under **Firebase Console → Authentication → Settings → Authorized domains**.
 5. Ensure `api.cleanmatedao.com` allows CORS and WebSocket origins from your Amplify domain.
-6. Update `ShareController` `gameUrl` in the matching `main_*.dart` file to the Amplify URL when you switch traffic away from Firebase Hosting.
-
 `customHttp.yml` applies the same cache and font CORS headers as `firebase.json`.
 
 ---

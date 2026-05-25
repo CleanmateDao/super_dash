@@ -35,5 +35,21 @@ void main() {
 
       expect(leaderboardEntry, equals(leaderboardEntryFrom));
     });
+
+    test('parses bannedAt from weekly json', () {
+      final entry = LeaderboardEntryData.fromWeeklyJson({
+        'rank': 1,
+        'userId': 'user-1',
+        'profileName': 'Runner',
+        'walletAddress': '0xabc',
+        'weekXp': 12.5,
+        'previousWeekXp': 10,
+        'rewardPoolAmount': 100,
+        'bannedAt': '2026-01-01T00:00:00.000Z',
+      });
+
+      expect(entry.isBanned, isTrue);
+      expect(entry.bannedAt, '2026-01-01T00:00:00.000Z');
+    });
   });
 }

@@ -40,8 +40,6 @@ abstract final class RushAnalyticsEvent {
   static const profileOpened = 'rush_profile_opened';
   static const logout = 'rush_logout';
   static const sessionDisconnected = 'rush_session_disconnected';
-  static const shareTwitter = 'rush_share_twitter';
-  static const shareFacebook = 'rush_share_facebook';
   static const externalLinkTapped = 'rush_external_link_tapped';
 }
 
@@ -166,16 +164,6 @@ class RushAnalytics {
 
   Future<void> logSessionDisconnected() =>
       _log(RushAnalyticsEvent.sessionDisconnected);
-
-  Future<void> logShareTwitter({required double xp}) => _log(
-        RushAnalyticsEvent.shareTwitter,
-        {'xp': xp},
-      );
-
-  Future<void> logShareFacebook({required double xp}) => _log(
-        RushAnalyticsEvent.shareFacebook,
-        {'xp': xp},
-      );
 
   Future<void> logExternalLinkTapped({required String link}) => _log(
         RushAnalyticsEvent.externalLinkTapped,

@@ -92,21 +92,9 @@
     "@scoreSubmissionErrorMessage": {
         "description": "Text shown in the score submission page"
     },
-    "shareYourScore": "Share your Cleanmate Rush score and challenge your friends to clean up more!",
-    "@shareYourScore": {
-        "description": "Text shown in the share page"
-    },
     "pts": "",
     "@pts": {
-        "description": "Text shown in the share page"
-    },
-    "shareOn": "Share on:",
-    "@shareOn": {
-        "description": "Text shown in the share page"
-    },
-    "share": "Share",
-    "@share": {
-        "description": "Text shown in the share page"
+        "description": "Points suffix label"
     },
     "backToLocations": "Back to locations",
     "@backToLocations": {

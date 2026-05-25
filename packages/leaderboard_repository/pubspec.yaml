@@ -1,5 +1,5 @@
 name: leaderboard_repository
-description: A repository to access leaderboard data in Firebase Cloud Firestore.
+description: A repository to access weekly XP leaderboard data from the Cleanmate API.
 version: 0.1.0+1
 publish_to: none
 

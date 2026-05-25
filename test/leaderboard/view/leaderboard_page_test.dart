@@ -17,11 +17,31 @@ class _MockLeaderboardBloc extends MockBloc<LeaderboardEvent, LeaderboardState>
     implements LeaderboardBloc {}
 
 class _FakeLeaderboardEntryData extends Fake implements LeaderboardEntryData {
+  _FakeLeaderboardEntryData({this.banned = false});
+
+  final bool banned;
+
   @override
   String get playerInitials => 'DASH';
 
   @override
   int get score => 42000;
+
+  @override
+  double get weekXp => 42;
+
+  @override
+  double get previousWeekXp => 40;
+
+  @override
+  num? get rewardPoolAmount => 100;
+
+  @override
+  String? get bannedAt =>
+      banned ? '2026-01-01T00:00:00.000Z' : null;
+
+  @override
+  bool get isBanned => banned;
 }
 
 extension on WidgetTester {
@@ -134,6 +154,19 @@ void main() {
           find.byType(ListView),
           findsOneWidget,
         );
+      },
+    );
+
+    testWidgets(
+      'renders ban badge and strikethrough for banned entries',
+      (tester) async {
+        when(() => leaderboardBloc.state).thenReturn(
+          LeaderboardLoaded(
+            entries: [_FakeLeaderboardEntryData(banned: true)],
+          ),
+        );
+        await tester.pumpApp(buildSubject());
+        expect(find.text('BAN'), findsOneWidget);
       },
     );
   });

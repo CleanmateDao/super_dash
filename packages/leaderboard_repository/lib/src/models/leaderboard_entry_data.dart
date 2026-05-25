@@ -30,6 +30,7 @@ class LeaderboardEntryData extends Equatable {
     this.weekXp = 0,
     this.previousWeekXp = 0,
     this.rewardPoolAmount,
+    this.bannedAt,
   });
 
   /// Factory which converts a [Map] into a [LeaderboardEntryData].
@@ -54,6 +55,7 @@ class LeaderboardEntryData extends Equatable {
       weekXp: weekXp,
       previousWeekXp: (json['previousWeekXp'] as num?)?.toDouble() ?? 0,
       rewardPoolAmount: json['rewardPoolAmount'] as num?,
+      bannedAt: json['bannedAt'] as String?,
     );
   }
 
@@ -100,6 +102,13 @@ class LeaderboardEntryData extends Equatable {
   @JsonKey(name: 'rewardPoolAmount')
   final num? rewardPoolAmount;
 
+  /// ISO ban timestamp when the account is banned.
+  @JsonKey(name: 'bannedAt')
+  final String? bannedAt;
+
+  /// Whether this entry belongs to a banned account.
+  bool get isBanned => bannedAt != null && bannedAt!.isNotEmpty;
+
   /// An empty [LeaderboardEntryData] object.
   static const empty = LeaderboardEntryData(
     score: 0,
@@ -117,5 +126,6 @@ class LeaderboardEntryData extends Equatable {
         weekXp,
         previousWeekXp,
         rewardPoolAmount,
+        bannedAt,
       ];
 }

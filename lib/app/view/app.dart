@@ -1,15 +1,12 @@
 import 'dart:async';
 
 import 'package:app_ui/app_ui.dart';
-import 'package:authentication_repository/authentication_repository.dart';
 import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/app_lifecycle/app_lifecycle.dart';
 import 'package:cleanmate_rush/audio/audio.dart';
 import 'package:cleanmate_rush/game_intro/game_intro.dart';
 import 'package:cleanmate_rush/l10n/l10n.dart';
-import 'package:cleanmate_rush/map_tester/map_tester.dart';
 import 'package:cleanmate_rush/settings/settings.dart';
-import 'package:cleanmate_rush/share/share.dart';
 import 'package:cleanmate_rush/user_session/user_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,21 +16,15 @@ class App extends StatelessWidget {
   App({
     required this.audioController,
     required this.settingsController,
-    required this.shareController,
-    required this.authenticationRepository,
     required this.leaderboardRepository,
     required this.networkCache,
     required this.rushAnalytics,
-    this.isTesting = false,
     super.key,
   });
 
-  final bool isTesting;
   final RushAnalytics rushAnalytics;
   final AudioController audioController;
   final SettingsController settingsController;
-  final ShareController shareController;
-  final AuthenticationRepository authenticationRepository;
   final LeaderboardRepository leaderboardRepository;
   final NetworkCache networkCache;
 
@@ -53,12 +44,6 @@ class App extends StatelessWidget {
           ),
           RepositoryProvider<SettingsController>.value(
             value: settingsController,
-          ),
-          RepositoryProvider<ShareController>.value(
-            value: shareController,
-          ),
-          RepositoryProvider<AuthenticationRepository>.value(
-            value: authenticationRepository..signInAnonymously(),
           ),
           RepositoryProvider<NetworkCache>.value(
             value: networkCache,
@@ -100,7 +85,7 @@ class App extends StatelessWidget {
             rushAnalytics: rushAnalytics,
             child: child ?? const SizedBox.shrink(),
           ),
-          home: isTesting ? const MapTesterView() : const GameIntroPage(),
+          home: const GameIntroPage(),
         ),
       ),
     );

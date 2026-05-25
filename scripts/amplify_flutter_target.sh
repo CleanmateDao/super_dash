@@ -14,9 +14,6 @@ case "${branch}" in
   production | prod)
     echo "lib/main_prod.dart"
     ;;
-  staging | stage)
-    echo "lib/main_tester.dart"
-    ;;
   *)
     # main and feature branches — matches Firebase dev deploy workflow
     echo "lib/main_dev.dart"

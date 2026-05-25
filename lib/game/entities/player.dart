@@ -94,7 +94,6 @@ class Player extends JumperCharacter<CleanmateRushGame> {
     cameraAnchor = PlayerCameraAnchor(
       cameraViewport: cameraViewport,
       levelSize: levelSize,
-      showCameraBounds: gameRef.inMapTester,
     );
 
     add(cameraAnchor);

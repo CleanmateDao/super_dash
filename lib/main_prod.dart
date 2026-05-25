@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:authentication_repository/authentication_repository.dart';
 import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/app/app.dart';
 import 'package:cleanmate_rush/audio/audio.dart';
@@ -8,7 +7,6 @@ import 'package:cleanmate_rush/bootstrap.dart';
 import 'package:cleanmate_rush/firebase_options_prod.dart';
 import 'package:cleanmate_rush/settings/persistence/persistence.dart';
 import 'package:cleanmate_rush/settings/settings.dart';
-import 'package:cleanmate_rush/share/share.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
 import 'package:leaderboard_repository/leaderboard_repository.dart';
@@ -32,31 +30,18 @@ void main() async {
 
   await audio.initialize();
 
-  final share = ShareController(
-    gameUrl: 'https://cleanmaterush.flutter.dev/',
-    rushAnalytics: rushAnalytics,
-  );
-
   final networkCache = NetworkCache();
   final leaderboardRepository = LeaderboardRepository(cache: networkCache);
 
   unawaited(
     bootstrap(
-      (firebaseAuth) async {
-        final authenticationRepository = AuthenticationRepository(
-          firebaseAuth: firebaseAuth,
-        );
-
-        return App(
-          audioController: audio,
-          settingsController: settings,
-          shareController: share,
-          rushAnalytics: rushAnalytics,
-          authenticationRepository: authenticationRepository,
-          leaderboardRepository: leaderboardRepository,
-          networkCache: networkCache,
-        );
-      },
+      () => App(
+        audioController: audio,
+        settingsController: settings,
+        rushAnalytics: rushAnalytics,
+        leaderboardRepository: leaderboardRepository,
+        networkCache: networkCache,
+      ),
     ),
   );
 }

@@ -8,13 +8,7 @@
       "name": "Launch game",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main_dev.dart",
-    },
-    {
-      "name": "Launch game tester",
-      "request": "launch",
-      "type": "dart",
-      "program": "lib/main_tester.dart",
+      "program": "lib/main_dev.dart"
     }
   ]
 }

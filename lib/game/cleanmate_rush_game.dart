@@ -11,7 +11,6 @@ import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/sprite.dart';
-import 'package:flame/text.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +35,6 @@ class CleanmateRushGame extends LeapGame
     required this.audioController,
     RushAnalytics? rushAnalytics,
     this.onRunEnded,
-    this.inMapTester = false,
   })  : rushAnalytics = rushAnalytics ?? RushAnalytics.noop(),
         super(
           tileSize: 64,
@@ -72,14 +70,17 @@ class CleanmateRushGame extends LeapGame
   final List<VoidCallback> _inputListener = [];
 
   late final SpriteSheet itemsSpritesheet;
-  final bool inMapTester;
 
   var _hasEndedRun = false;
+  var _hasAwardedRunXp = false;
   var _loggedFirstInput = false;
   var _isAdvancingSection = false;
   Completer<void>? _gameOverCompleter;
 
   GameState get state => gameBloc.state;
+
+  /// Whether the current run has ended (game over, completion, or quit).
+  bool get hasEndedRun => _hasEndedRun;
 
   Player? get player => world.firstChild<Player>();
 
@@ -106,7 +107,7 @@ class CleanmateRushGame extends LeapGame
   }
 
   void _triggerInputListeners() {
-    if (!_loggedFirstInput && !inMapTester) {
+    if (!_loggedFirstInput) {
       _loggedFirstInput = true;
       unawaited(rushAnalytics.logFirstInput());
     }
@@ -126,10 +127,6 @@ class CleanmateRushGame extends LeapGame
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-
-    if (inMapTester) {
-      _addMapTesterFeatures();
-    }
 
     if (kIsWeb && audioController.isMusicEnabled) {
       audioController.startMusic();
@@ -233,7 +230,7 @@ class CleanmateRushGame extends LeapGame
       pauseEngine();
       overlays.remove('tapToJump');
 
-      unawaited(_postGameplayXp(xp));
+      await _awardRunXp(xp);
 
       gameBloc.add(const GameOver());
 
@@ -281,7 +278,32 @@ class CleanmateRushGame extends LeapGame
     overlays.add('tapToJump');
     resumeEngine();
     _hasEndedRun = false;
+    _hasAwardedRunXp = false;
     _loggedFirstInput = false;
+  }
+
+  /// Ends the run early when the player leaves gameplay and awards earned XP.
+  Future<void> quitRun() async {
+    if (_hasEndedRun) {
+      return;
+    }
+
+    _hasEndedRun = true;
+    pauseEngine();
+    overlays.remove('tapToJump');
+
+    final xp = gameBloc.state.xp;
+    await _awardRunXp(xp);
+    gameBloc.add(const GameOver());
+  }
+
+  Future<void> _awardRunXp(double xp) async {
+    if (_hasAwardedRunXp || xp <= 0) {
+      return;
+    }
+
+    _hasAwardedRunXp = true;
+    await _postGameplayXp(xp);
   }
 
   Future<void> _postGameplayXp(double xp) async {
@@ -474,77 +496,4 @@ class CleanmateRushGame extends LeapGame
 
   bool get isLastSection => state.currentSection == _sections.length - 1;
   bool get isFirstSection => state.currentSection == 0;
-
-  void addCameraDebugger() {
-    if (descendants().whereType<CameraDebugger>().isEmpty) {
-      final player = world.firstChild<Player>()!;
-
-      final cameraDebugger = CameraDebugger(
-        position: player.position.clone(),
-      );
-      world.add(cameraDebugger);
-
-      final anchor = PlayerCameraAnchor(
-        levelSize: leapMap.tiledMap.size.clone(),
-        cameraViewport: _cameraViewport,
-      );
-      cameraDebugger.add(anchor);
-      camera.follow(anchor);
-
-      final proximityBuilders =
-          descendants().whereType<ObjectGroupProximityBuilder<Player>>();
-      for (final proximityBuilder in proximityBuilders) {
-        proximityBuilder.currentReference = cameraDebugger;
-      }
-
-      player.removeFromParent();
-    }
-  }
-
-  void toggleInvincibility() {
-    player?.isPlayerInvincible = !(player?.isPlayerInvincible ?? false);
-  }
-
-  void teleportPlayerToEnd() {
-    player?.x = leapMap.tiledMap.size.x - (player?.size.x ?? 0) * 10 * 4;
-    if (state.currentSection == 2) {
-      player?.y = (player?.y ?? 0) - (tileSize * 4);
-    }
-  }
-
-  void showHitBoxes() {
-    void show() {
-      descendants()
-          .whereType<PhysicalEntity>()
-          .where(
-            (element) =>
-                element is Player || element is Item || element is Enemy,
-          )
-          .forEach((entity) => entity.debugMode = true);
-    }
-
-    show();
-    add(
-      TimerComponent(
-        period: 1,
-        repeat: true,
-        onTick: show,
-      ),
-    );
-  }
-
-  void _addMapTesterFeatures() {
-    add(FpsComponent());
-    add(
-      FpsTextComponent(
-        position: Vector2(0, 0),
-        textRenderer: TextPaint(
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-          ),
-        ),
-      ),
-    );
-  }
 }

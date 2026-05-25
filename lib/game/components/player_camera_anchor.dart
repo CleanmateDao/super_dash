@@ -1,18 +1,14 @@
 import 'package:cleanmate_rush/game/cleanmate_rush_game.dart';
 import 'package:flame/components.dart';
-import 'package:flame/effects.dart';
-import 'package:flutter/material.dart';
 
 class CameraBounds extends PositionComponent {
   CameraBounds({
     required this.reference,
     required this.bound,
-    this.showBounds = false,
   });
 
   final PositionComponent reference;
   final double bound;
-  final bool showBounds;
 
   late final Vector2 referenceOffset;
 
@@ -57,51 +53,6 @@ class CameraBounds extends PositionComponent {
     position.y = reference.position.y + referenceOffset.y;
 
     _updatePosition(0);
-
-    if (showBounds) {
-      const referenceLine = 150.0;
-      add(
-        RectangleComponent(
-          position: Vector2(
-            -referenceLine / 2,
-            -bound,
-          ),
-          size: Vector2(
-            referenceLine,
-            2,
-          ),
-          paint: Paint()..color = Colors.red,
-        ),
-      );
-
-      add(
-        RectangleComponent(
-          position: Vector2(
-            -referenceLine / 2,
-            0,
-          ),
-          size: Vector2(
-            referenceLine,
-            2,
-          ),
-          paint: Paint()..color = Colors.green,
-        ),
-      );
-
-      add(
-        RectangleComponent(
-          position: Vector2(
-            -referenceLine / 2,
-            bound,
-          ),
-          size: Vector2(
-            referenceLine,
-            2,
-          ),
-          paint: Paint()..color = Colors.red,
-        ),
-      );
-    }
   }
 
   @override
@@ -118,14 +69,12 @@ class PlayerCameraAnchor extends Component
   PlayerCameraAnchor({
     required this.levelSize,
     required this.cameraViewport,
-    this.showCameraBounds = false,
   });
 
   final Vector2 levelSize;
   final Vector2 cameraViewport;
   final Vector2 _anchor = Vector2.zero();
   late final PositionComponent _bounds;
-  final bool showCameraBounds;
 
   late final Vector2 _cameraMin = Vector2(
     cameraViewport.x * .4,
@@ -156,7 +105,6 @@ class PlayerCameraAnchor extends Component
     _bounds = CameraBounds(
       reference: parent,
       bound: 128,
-      showBounds: showCameraBounds,
     );
     gameRef.world.add(_bounds);
 

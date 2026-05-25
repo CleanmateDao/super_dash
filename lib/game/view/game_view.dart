@@ -74,45 +74,68 @@ class _GameViewState extends State<GameView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
-          GameWidget.controlled(
-            loadingBuilder: (context) => const GameBackground(),
-            backgroundBuilder: (context) => const GameBackground(),
-            gameFactory: () {
-              final game = CleanmateRushGame(
-                gameBloc: context.read<GameBloc>(),
-                audioController: context.read<AudioController>(),
-                rushAnalytics: context.read<RushAnalytics>(),
-                onRunEnded: _showGameEndScreen,
-              );
-              _game = game;
-              unawaited(context.read<RushAnalytics>().logGameRunStarted());
-              return game;
-            },
-            overlayBuilderMap: {
-              'tapToJump': (context, game) => const TapToJumpOverlay(),
-            },
-            initialActiveOverlays: const ['tapToJump'],
-          ),
-          Positioned(
-            top: 12,
-            left: ResponsiveInsets.page(context).left,
-            right: ResponsiveInsets.page(context).right,
-            child: const XpLabel(),
-          ),
-          Positioned(
-            bottom: 12,
-            left: ResponsiveInsets.page(context).left,
-            right: ResponsiveInsets.page(context).right,
-            child: const SafeArea(
-              child: Center(child: AudioButton()),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (didPop) {
+          return;
+        }
+
+        unawaited(_handleGameExit());
+      },
+      child: Scaffold(
+        body: Stack(
+          alignment: Alignment.center,
+          children: [
+            GameWidget.controlled(
+              loadingBuilder: (context) => const GameBackground(),
+              backgroundBuilder: (context) => const GameBackground(),
+              gameFactory: () {
+                final game = CleanmateRushGame(
+                  gameBloc: context.read<GameBloc>(),
+                  audioController: context.read<AudioController>(),
+                  rushAnalytics: context.read<RushAnalytics>(),
+                  onRunEnded: _showGameEndScreen,
+                );
+                _game = game;
+                unawaited(context.read<RushAnalytics>().logGameRunStarted());
+                return game;
+              },
+              overlayBuilderMap: {
+                'tapToJump': (context, game) => const TapToJumpOverlay(),
+              },
+              initialActiveOverlays: const ['tapToJump'],
             ),
-          ),
-        ],
+            Positioned(
+              top: 12,
+              left: ResponsiveInsets.page(context).left,
+              right: ResponsiveInsets.page(context).right,
+              child: const XpLabel(),
+            ),
+            Positioned(
+              bottom: 12,
+              left: ResponsiveInsets.page(context).left,
+              right: ResponsiveInsets.page(context).right,
+              child: const SafeArea(
+                child: Center(child: AudioButton()),
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  Future<void> _handleGameExit() async {
+    final game = _game;
+    if (game != null && !game.hasEndedRun) {
+      await game.quitRun();
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    Navigator.of(context).pop();
   }
 }

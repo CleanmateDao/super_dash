@@ -429,22 +429,7 @@ class _LeaderboardEntries extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: walletAddress == null
-                    ? Text(
-                        entry.playerInitials,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.bodyMedium?.copyWith(
-                          fontWeight: AppFontWeights.medium,
-                        ),
-                      )
-                    : WalletUsernameText(
-                        walletAddress: walletAddress,
-                        profileName: entry.profileName,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.bodyMedium?.copyWith(
-                          fontWeight: AppFontWeights.medium,
-                        ),
-                      ),
+                child: _LeaderboardEntryName(entry: entry),
               ),
               const SizedBox(width: 8),
               _LeaderboardEntryScore(entry: entry),
@@ -454,6 +439,93 @@ class _LeaderboardEntries extends StatelessWidget {
       },
     );
   }
+}
+
+class _LeaderboardEntryName extends StatelessWidget {
+  const _LeaderboardEntryName({required this.entry});
+
+  final LeaderboardEntryData entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final walletAddress = entry.walletAddress;
+    final nameStyle = textTheme.bodyMedium?.copyWith(
+      fontWeight: AppFontWeights.medium,
+    );
+
+    return Row(
+      children: [
+        Flexible(
+          child: walletAddress == null
+              ? Text(
+                  entry.playerInitials,
+                  overflow: TextOverflow.ellipsis,
+                  style: nameStyle,
+                )
+              : WalletUsernameText(
+                  walletAddress: walletAddress,
+                  profileName: entry.profileName,
+                  overflow: TextOverflow.ellipsis,
+                  style: nameStyle,
+                ),
+        ),
+        if (entry.isBanned) ...[
+          const SizedBox(width: 6),
+          const BanBadge(),
+        ],
+      ],
+    );
+  }
+}
+
+@visibleForTesting
+class BanBadge extends StatelessWidget {
+  const BanBadge({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.appTheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Tooltip(
+      message: 'Banned account',
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: tokens.destructive.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: tokens.destructive),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+          child: Text(
+            'BAN',
+            style: textTheme.labelSmall?.copyWith(
+              color: tokens.destructive,
+              fontWeight: AppFontWeights.bold,
+              fontSize: 9,
+              height: 1,
+              letterSpacing: 0.8,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+TextStyle _bannedScoreTextStyle(
+  TextStyle base,
+  AppThemeTokens tokens, {
+  Color? color,
+}) {
+  final resolvedColor = color ?? base.color;
+  return base.copyWith(
+    color: resolvedColor?.withValues(alpha: 0.75),
+    decoration: TextDecoration.lineThrough,
+    decorationColor: tokens.destructive,
+    decorationThickness: 2,
+  );
 }
 
 class _LeaderboardEntryScore extends StatelessWidget {
@@ -467,45 +539,66 @@ class _LeaderboardEntryScore extends StatelessWidget {
     final tokens = context.appTheme;
     final xpDelta = entry.weekXp - entry.previousWeekXp;
     final rewardPoolAmount = entry.rewardPoolAmount;
+    final banned = entry.isBanned;
+    final xpTextStyle = banned
+        ? _bannedScoreTextStyle(
+            textTheme.bodyMedium!.copyWith(fontWeight: AppFontWeights.bold),
+            tokens,
+          )
+        : textTheme.bodyMedium?.copyWith(
+            fontWeight: AppFontWeights.bold,
+          );
+    final rewardTextStyle = banned
+        ? _bannedScoreTextStyle(
+            textTheme.bodySmall!.copyWith(color: tokens.mutedForeground),
+            tokens,
+            color: tokens.mutedForeground,
+          )
+        : textTheme.bodySmall?.copyWith(
+            color: tokens.mutedForeground,
+          );
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              xpDelta >= 0
-                  ? Icons.trending_up_outlined
-                  : Icons.trending_down_outlined,
-              color: xpDelta >= 0 ? tokens.success : tokens.destructive,
-              size: 15,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              entry.weekXp.toStringAsFixed(2),
-              style: textTheme.bodyMedium?.copyWith(
-                fontWeight: AppFontWeights.bold,
-              ),
-            ),
-            const SizedBox(width: 3),
-            const XpIcon(size: 16),
-          ],
-        ),
-        if (rewardPoolAmount != null) ...[
-          const SizedBox(height: 2),
-          Row(
+        Opacity(
+          opacity: banned ? 0.75 : 1,
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                '+${rewardPoolAmount.toStringAsFixed(0)}',
-                style: textTheme.bodySmall?.copyWith(
-                  color: tokens.mutedForeground,
-                ),
+              Icon(
+                xpDelta >= 0
+                    ? Icons.trending_up_outlined
+                    : Icons.trending_down_outlined,
+                color: xpDelta >= 0 ? tokens.success : tokens.destructive,
+                size: 15,
               ),
               const SizedBox(width: 4),
-              const B3trIcon(),
+              Text(
+                entry.weekXp.toStringAsFixed(2),
+                style: xpTextStyle,
+              ),
+              const SizedBox(width: 3),
+              const XpIcon(size: 16),
             ],
+          ),
+        ),
+        if (rewardPoolAmount != null && rewardPoolAmount > 0) ...[
+          const SizedBox(height: 2),
+          Opacity(
+            opacity: banned ? 0.75 : 1,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '+${rewardPoolAmount.toStringAsFixed(0)}',
+                  style: rewardTextStyle,
+                ),
+                const SizedBox(width: 4),
+                const B3trIcon(),
+              ],
+            ),
           ),
         ],
       ],

@@ -18,6 +18,7 @@ LeaderboardEntryData _$LeaderboardEntryDataFromJson(
       weekXp: (json['weekXp'] as num?)?.toDouble() ?? 0,
       previousWeekXp: (json['previousWeekXp'] as num?)?.toDouble() ?? 0,
       rewardPoolAmount: json['rewardPoolAmount'] as num?,
+      bannedAt: json['bannedAt'] as String?,
     );
 
 Map<String, dynamic> _$LeaderboardEntryDataToJson(
@@ -32,4 +33,5 @@ Map<String, dynamic> _$LeaderboardEntryDataToJson(
       'weekXp': instance.weekXp,
       'previousWeekXp': instance.previousWeekXp,
       'rewardPoolAmount': instance.rewardPoolAmount,
+      'bannedAt': instance.bannedAt,
     };
