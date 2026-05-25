@@ -19,10 +19,8 @@
   <meta property="og:image:type" content="image/png">
 
   <link rel="icon" type="image/png" href="favicon.png" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
 
   <title>Cleanmate Rush</title>
   <link rel="manifest" href="manifest.json">
@@ -30,7 +28,7 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-67589403-11"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', 'UA-67589403-11');
   </script>
@@ -107,6 +105,7 @@
         width: 20%;
         margin-left: 0%;
       }
+
       to {
         width: 60%;
         margin-left: 40%;
@@ -119,21 +118,10 @@
       font-size: 18px;
       font-weight: 600;
     }
-
-    #splash-logo {
-      position: absolute;
-      top: 50px;
-      width: min(300px, 70vw);
-      height: auto;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-    }
   </style>
 </head>
 
 <body class="loading-mode">
-  <object id="splash-logo" type="text/html" data="logo.html"></object>
   <p id="splash-copy">
     Loading...
   </p>
