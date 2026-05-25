@@ -256,11 +256,11 @@ abstract class AppLocalizations {
   /// **'Share'**
   String get share;
 
-  /// Text shown in the share page
+  /// Text shown on the game over page to return to locations
   ///
   /// In en, this message translates to:
-  /// **'See the ranking'**
-  String get seeTheRanking;
+  /// **'Back to locations'**
+  String get backToLocations;
 
   /// Text shown in the game over page
   ///

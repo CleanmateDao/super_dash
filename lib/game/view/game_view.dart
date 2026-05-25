@@ -54,13 +54,20 @@ class _GameViewState extends State<GameView> {
         ),
       );
       Navigator.of(context, rootNavigator: true)
-          .push<bool>(ScorePage.route(xp: xp))
-          .then((playAgain) {
-        if (!mounted || playAgain != true) {
+          .push<ScoreFlowResult>(ScorePage.route(xp: xp))
+          .then((result) {
+        if (!mounted || result == null) {
           return;
         }
-        unawaited(analytics.logPlayAgain(source: 'score_flow'));
-        unawaited(_game?.restartRun());
+        switch (result) {
+          case ScoreFlowResult.playAgain:
+            unawaited(analytics.logPlayAgain(source: 'score_flow'));
+            unawaited(_game?.restartRun());
+          case ScoreFlowResult.backToLocations:
+            Navigator.of(context, rootNavigator: true).pop();
+          case ScoreFlowResult.dismissed:
+            break;
+        }
       });
     });
   }

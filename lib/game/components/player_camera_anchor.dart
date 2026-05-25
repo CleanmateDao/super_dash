@@ -165,6 +165,12 @@ class PlayerCameraAnchor extends Component
   }
 
   @override
+  void onRemove() {
+    _bounds.removeFromParent();
+    super.onRemove();
+  }
+
+  @override
   void update(double dt) {
     super.update(dt);
 

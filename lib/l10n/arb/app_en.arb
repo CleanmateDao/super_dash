@@ -108,9 +108,9 @@
     "@share": {
         "description": "Text shown in the share page"
     },
-    "seeTheRanking": "See the ranking",
-    "@seeTheRanking": {
-        "description": "Text shown in the share page"
+    "backToLocations": "Back to locations",
+    "@backToLocations": {
+        "description": "Text shown on the game over page to return to locations"
     },
     "gameOver": "Game over!",
     "@gameOver": {

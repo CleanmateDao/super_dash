@@ -93,19 +93,14 @@ class GameOverPage extends StatelessWidget {
                   const SizedBox(height: 32),
                   GameElevatedButton(
                     expanded: context.isCompact,
-                    label: l10n.seeTheRanking,
+                    label: l10n.backToLocations,
                     onPressed: () {
                       unawaited(
-                        context.read<RushAnalytics>().logLeaderboardRankingTapped(),
-                      );
-                      unawaited(
-                        context.read<RushAnalytics>().logLeaderboardOpened(
-                              source: 'game_over',
+                        context.read<RushAnalytics>().logScreenView(
+                              RushAnalyticsScreen.locations,
                             ),
                       );
-                      context
-                          .read<ScoreBloc>()
-                          .add(const ScoreLeaderboardRequested());
+                      completeBackToLocationsFlow(context);
                     },
                   ),
                   const SizedBox(height: 16),

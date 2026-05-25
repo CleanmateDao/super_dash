@@ -237,7 +237,7 @@ class CleanmateRushGame extends LeapGame
 
       gameBloc.add(const GameOver());
 
-      world.firstChild<Player>()?.removeFromParent();
+      _clearWorldRunActors();
       _resetEntities();
 
       if (onRunEnded == null) {
@@ -261,6 +261,9 @@ class CleanmateRushGame extends LeapGame
 
     gameBloc.add(const GameOver());
 
+    _clearWorldRunActors();
+    _resetEntities();
+
     await loadWorldAndMap(
       images: images,
       prefix: prefix,
@@ -273,13 +276,7 @@ class CleanmateRushGame extends LeapGame
     if (isFirstSection) {
       _addTreeHouseSign();
     }
-    final newPlayer = Player(
-      levelSize: leapMap.tiledMap.size.clone(),
-      cameraViewport: _cameraViewport,
-    );
-    await world.add(newPlayer);
-
-    await newPlayer.mounted;
+    await _spawnFreshPlayer();
     await _addSpawners();
     overlays.add('tapToJump');
     resumeEngine();
@@ -342,6 +339,30 @@ class CleanmateRushGame extends LeapGame
         .forEach((enemy) => enemy.removeFromParent());
   }
 
+  void _clearWorldRunActors() {
+    for (final player in world.children.whereType<Player>().toList()) {
+      player.removeFromParent();
+    }
+    for (final bounds in world.children.whereType<CameraBounds>().toList()) {
+      bounds.removeFromParent();
+    }
+  }
+
+  Future<void> _spawnFreshPlayer() async {
+    final newPlayer = Player(
+      levelSize: leapMap.tiledMap.size.clone(),
+      cameraViewport: _cameraViewport,
+    );
+    await world.add(newPlayer);
+    await newPlayer.mounted;
+    newPlayer
+      ..walking = true
+      ..spritePaintColor(Colors.white)
+      ..isPlayerTeleporting = false;
+    newPlayer.stateBehavior.state = DashState.running;
+    camera.follow(newPlayer.cameraAnchor);
+  }
+
   Future<void> _addSpawners() async {
     await addAll([
       ObjectGroupProximityBuilder<Player>(
@@ -361,7 +382,7 @@ class CleanmateRushGame extends LeapGame
 
   Future<void> _loadNewSection(int sectionIndex) async {
     _resetEntities();
-    world.firstChild<Player>()?.removeFromParent();
+    _clearWorldRunActors();
 
     await loadWorldAndMap(
       images: images,
@@ -377,17 +398,7 @@ class CleanmateRushGame extends LeapGame
       _addTreeHouseFrontLayer();
     }
 
-    final newPlayer = Player(
-      levelSize: leapMap.tiledMap.size.clone(),
-      cameraViewport: _cameraViewport,
-    );
-    await world.add(newPlayer);
-    await newPlayer.mounted;
-    newPlayer
-      ..walking = true
-      ..spritePaintColor(Colors.white)
-      ..isPlayerTeleporting = false;
-
+    await _spawnFreshPlayer();
     await _addSpawners();
   }
 
@@ -403,6 +414,7 @@ class CleanmateRushGame extends LeapGame
     player?.walking = true;
     player?.spritePaintColor(Colors.white);
     player?.isPlayerTeleporting = false;
+    player?.stateBehavior.state = DashState.running;
 
     _setSectionBackground();
   }

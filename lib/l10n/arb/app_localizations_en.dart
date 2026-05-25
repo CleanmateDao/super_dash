@@ -100,7 +100,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get share => 'Share';
 
   @override
-  String get seeTheRanking => 'See the ranking';
+  String get backToLocations => 'Back to locations';
 
   @override
   String get gameOver => 'Game over!';

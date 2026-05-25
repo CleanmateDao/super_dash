@@ -12,13 +12,20 @@ void completePlayAgainFlow(BuildContext context) {
   );
 }
 
+/// Completes the score flow and returns the player to locations.
+void completeBackToLocationsFlow(BuildContext context) {
+  context.flow<ScoreState>().complete(
+    (state) => state.copyWith(backToLocationsRequested: true),
+  );
+}
+
 class ScorePage extends StatelessWidget {
   const ScorePage({
     required this.xp,
     super.key,
   });
 
-  static PageRoute<bool> route({required double xp}) {
+  static PageRoute<ScoreFlowResult> route({required double xp}) {
     return PageRouteBuilder(
       settings: const RouteSettings(name: RushAnalyticsScreen.score),
       pageBuilder: (_, __, ___) => ScorePage(xp: xp),
@@ -47,7 +54,7 @@ class ScoreView extends StatelessWidget {
       state: context.select((ScoreBloc bloc) => bloc.state),
       onGeneratePages: onGenerateScorePages,
       onComplete: (state) {
-        Navigator.of(context, rootNavigator: true).pop(state.playAgainRequested);
+        Navigator.of(context, rootNavigator: true).pop(state.flowResult);
       },
     );
   }
