@@ -9,7 +9,8 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get gameIntroPageHeadline => 'Clean up trash across the world, avoid the bugs, and earn as you run!';
+  String get gameIntroPageHeadline =>
+      'Clean up trash across the world, avoid the bugs, and earn as you run!';
 
   @override
   String get gameIntroPagePlayButtonText => 'Play';
@@ -18,40 +19,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gameInstructionsPageAutoRunTitle => 'Dash Auto-runs';
 
   @override
-  String get gameInstructionsPageAutoRunDescription => 'Welcome to Cleanmate Rush. Your cleaner runs automatically through each location.';
+  String get gameInstructionsPageAutoRunDescription =>
+      'Welcome to Cleanmate Rush. Your cleaner runs automatically through each location.';
 
   @override
   String get gameInstructionsPageTapToJumpTitle => 'Tap to Jump';
 
   @override
-  String get gameInstructionsPageTapToJumpDescription => 'Tap the screen to make Dash jump.';
+  String get gameInstructionsPageTapToJumpDescription =>
+      'Tap the screen to make Dash jump.';
 
   @override
-  String get gameInstructionsPageTapToJumpDescriptionDesktop => 'Press spacebar to make Dash jump.';
+  String get gameInstructionsPageTapToJumpDescriptionDesktop =>
+      'Press spacebar to make Dash jump.';
 
   @override
   String get gameInstructionsPageCollectEggsAcornsTitle => 'Collect Trash';
 
   @override
-  String get gameInstructionsPageCollectEggsAcornsDescription => 'Pick up trash and recyclables in each location to earn rewards.';
+  String get gameInstructionsPageCollectEggsAcornsDescription =>
+      'Pick up trash and recyclables in each location to earn rewards.';
 
   @override
   String get gameInstructionsPagePowerfulWingsTitle => 'Cleanup Boost';
 
   @override
-  String get gameInstructionsPagePowerfulWingsDescription => 'Collect special cleanup boosts to power through tricky areas. While in midair, tap to do a double jump.';
+  String get gameInstructionsPagePowerfulWingsDescription =>
+      'Collect special cleanup boosts to power through tricky areas. While in midair, tap to do a double jump.';
 
   @override
   String get gameInstructionsPageLevelGatesTitle => 'Level Gates';
 
   @override
-  String get gameInstructionsPageLevelGatesDescription => 'Advance through locations to face tougher cleanup challenges around the world.';
+  String get gameInstructionsPageLevelGatesDescription =>
+      'Advance through locations to face tougher cleanup challenges around the world.';
 
   @override
   String get gameInstructionsPageAvoidBugsTitle => 'Avoid Bugs';
 
   @override
-  String get gameInstructionsPageAvoidBugsDescription => 'Bugs slow down the cleanup. Jump to dodge them and keep your run alive.';
+  String get gameInstructionsPageAvoidBugsDescription =>
+      'Bugs slow down the cleanup. Jump to dodge them and keep your run alive.';
 
   @override
   String get cleanmateRush => 'Cleanmate Rush';
@@ -75,7 +83,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get initialsErrorMessage => 'Please enter three initials';
 
   @override
-  String get scoreSubmissionErrorMessage => 'There was an error submitting your score';
+  String get scoreSubmissionErrorMessage =>
+      'There was an error submitting your score';
 
   @override
   String get pts => '';
@@ -107,7 +116,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get leaderboardPageLeaderboardHeadline => 'Leaderboard';
 
   @override
-  String get leaderboardPageLeaderboardErrorText => 'There was an error while fetching the leaderboard.';
+  String get leaderboardPageLeaderboardErrorText =>
+      'There was an error while fetching the leaderboard.';
 
   @override
   String get leaderboardPageLeaderboardNoEntries => 'No entries';

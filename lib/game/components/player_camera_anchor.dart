@@ -1,5 +1,6 @@
 import 'package:cleanmate_rush/game/cleanmate_rush_game.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart' show ReadOnlyPositionProvider;
 
 class CameraBounds extends PositionComponent {
   CameraBounds({
