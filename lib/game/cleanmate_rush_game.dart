@@ -111,6 +111,7 @@ class CleanmateRushGame extends LeapGame
       _loggedFirstInput = true;
       unawaited(rushAnalytics.logFirstInput());
     }
+    audioController.notifyUserGesture();
     for (final listener in _inputListener) {
       listener();
     }

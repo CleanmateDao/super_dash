@@ -125,6 +125,7 @@ class _IntroPageState extends State<_IntroPage> {
   }
 
   Future<void> _onLinkPressed() async {
+    context.read<AudioController>().notifyUserGesture();
     final analytics = context.read<RushAnalytics>();
     unawaited(analytics.logWalletLinkOpened());
     final linked = await showResponsivePanel<bool>(
@@ -139,6 +140,7 @@ class _IntroPageState extends State<_IntroPage> {
   }
 
   void _onPlayPressed(String walletAddress) {
+    context.read<AudioController>().notifyUserGesture();
     unawaited(context.read<RushAnalytics>().logPlayPressed());
     Navigator.of(context)
         .push(LocationsPage.route(walletAddress: walletAddress));

@@ -38,6 +38,7 @@ class GameView extends StatefulWidget {
 
 class _GameViewState extends State<GameView> {
   CleanmateRushGame? _game;
+  ValueNotifier<AppLifecycleState>? _lifecycleNotifier;
 
   void _showGameEndScreen(double xp) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -70,6 +71,42 @@ class _GameViewState extends State<GameView> {
         }
       });
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _lifecycleNotifier = context.read<ValueNotifier<AppLifecycleState>>()
+      ..addListener(_handleLifecycleChanged);
+  }
+
+  @override
+  void dispose() {
+    _lifecycleNotifier?.removeListener(_handleLifecycleChanged);
+    _lifecycleNotifier = null;
+    super.dispose();
+  }
+
+  void _handleLifecycleChanged() {
+    final notifier = _lifecycleNotifier;
+    final game = _game;
+    if (notifier == null || game == null) {
+      return;
+    }
+
+    switch (notifier.value) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        // Best-effort: if the app is backgrounded/closed, end the run and post
+        // any earned XP.
+        if (!game.hasEndedRun) {
+          unawaited(game.quitRun());
+        }
+      case AppLifecycleState.resumed:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+        break;
+    }
   }
 
   @override

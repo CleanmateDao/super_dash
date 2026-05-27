@@ -26,12 +26,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     GameOver event,
     Emitter<GameState> emit,
   ) {
-    emit(
-      state.copyWith(
-        xp: 0,
-        currentSection: 0,
-      ),
-    );
+    // A game over or an early quit should reset the run entirely.
+    emit(const GameState.initial());
   }
 
   void _onGameSectionCompleted(

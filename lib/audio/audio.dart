@@ -67,6 +67,8 @@ class AudioController {
 
   final Queue<Song> _playlist;
   var _musicRequested = false;
+  var _autoplayBlocked = false;
+  Future<void>? _musicOp;
 
   SettingsController? _settings;
 
@@ -108,6 +110,13 @@ class AudioController {
     settingsController.muted.addListener(_mutedHandler);
     settingsController.musicOn.addListener(_musicOnHandler);
     settingsController.soundsOn.addListener(_soundsOnHandler);
+
+    // If the user's settings say music should be on, request it immediately.
+    // On web this can still be blocked until a user gesture; we handle that
+    // via `_ensureMusicPlaying()` + `notifyUserGesture()`.
+    if (settingsController.musicOn.value) {
+      startMusic();
+    }
   }
 
   bool get isMusicEnabled =>
@@ -220,6 +229,38 @@ class AudioController {
     );
   }
 
+  Future<void> _ensureMusicPlaying() async {
+    if (_musicOp != null) {
+      await _musicOp;
+      return;
+    }
+
+    _musicOp = () async {
+      if (!_musicRequested || !isMusicEnabled) {
+        return;
+      }
+      try {
+        await _resumeMusic();
+        _autoplayBlocked = false;
+      } on Object catch (e, st) {
+        // On web, browsers can block autoplay until a user gesture happens.
+        // We keep the music requested and retry after the next gesture.
+        _autoplayBlocked = true;
+        _log.warning(
+          'Music start/resume failed (will retry after user gesture).',
+          e,
+          st,
+        );
+      }
+    }();
+
+    try {
+      await _musicOp;
+    } finally {
+      _musicOp = null;
+    }
+  }
+
   Future<void> _resumeMusic() async {
     _log.info('Resuming music');
     switch (_musicPlayer.state) {
@@ -270,7 +311,22 @@ class AudioController {
 
     if (_musicPlayer.state != PlayerState.playing) {
       _log.info('starting music');
-      _playFirstSongInPlaylist();
+      // Intentionally not awaited: callers are often sync contexts.
+      _ensureMusicPlaying();
+    }
+  }
+
+  /// Call this from a UI/game input handler (tap/click/keypress).
+  ///
+  /// On web, browsers can block autoplay until a user gesture occurs.
+  /// When that happens, we remember the failure and retry here.
+  void notifyUserGesture() {
+    if (!_autoplayBlocked) {
+      return;
+    }
+    if (_musicRequested && isMusicEnabled) {
+      _log.info('User gesture received; retrying music.');
+      _ensureMusicPlaying();
     }
   }
 
