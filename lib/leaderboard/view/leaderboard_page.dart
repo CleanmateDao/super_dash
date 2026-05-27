@@ -84,9 +84,9 @@ class LeaderboardView extends StatelessWidget {
             children: [
               SizedBox(
                 height: switch (context.screenLayout) {
-                  ScreenLayout.compact => 24,
-                  ScreenLayout.medium => 40,
-                  _ => MediaQuery.sizeOf(context).height * 0.08,
+                  ScreenLayout.compact => 40,
+                  ScreenLayout.medium => 56,
+                  _ => MediaQuery.sizeOf(context).height * 0.10,
                 },
               ),
               const Leaderboard(),
@@ -139,7 +139,7 @@ class Leaderboard extends StatelessWidget {
     return Align(
       child: Container(
         width: panelSize.width,
-        height: panelSize.height,
+        height: panelSize.height * 0.85,
         decoration: BoxDecoration(
           borderRadius: AppRadii.xlBorder,
           gradient: tokens.cardGradient,
@@ -276,25 +276,22 @@ class LeaderboardContent extends StatelessWidget {
           left: 0,
           right: 0,
           bottom: 0,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Container(
-                width: constraints.maxWidth,
-                height: constraints.maxHeight * 0.2,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    stops: const [0.0, 0.8],
-                    colors: [
-                      Colors.transparent,
-                      tokens.card,
-                    ],
-                  ),
+          child: IgnorePointer(
+            child: Container(
+              height: 72,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(20)),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: const [0.0, 0.8],
+                  colors: [
+                    Colors.transparent,
+                    tokens.card,
+                  ],
                 ),
-              );
-            },
+              ),
+            ),
           ),
         ),
       ],

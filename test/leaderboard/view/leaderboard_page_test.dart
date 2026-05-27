@@ -22,7 +22,16 @@ class _FakeLeaderboardEntryData extends Fake implements LeaderboardEntryData {
   final bool banned;
 
   @override
+  int? get rank => 1;
+
+  @override
   String get playerInitials => 'DASH';
+
+  @override
+  String? get walletAddress => null;
+
+  @override
+  String? get profileName => null;
 
   @override
   int get score => 42000;
