@@ -63,7 +63,11 @@ class _GameViewState extends State<GameView> {
         switch (result) {
           case ScoreFlowResult.playAgain:
             unawaited(analytics.logPlayAgain(source: 'score_flow'));
-            unawaited(_game?.restartRun());
+            // Start a completely fresh game run by replacing the current
+            // game route with a new one. This guarantees the level, XP and
+            // world state are reset, avoiding any lingering "end of run"
+            // state from the previous session.
+            Navigator.of(context).pushReplacement(Game.route());
           case ScoreFlowResult.backToLocations:
             Navigator.of(context, rootNavigator: true).pop();
           case ScoreFlowResult.dismissed:
