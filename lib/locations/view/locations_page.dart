@@ -61,6 +61,7 @@ class _LocationsPageState extends State<LocationsPage> {
           walletAddress: account?.walletAddress ?? widget.walletAddress,
           profileName: account?.profileName,
           weekXp: account?.weekXp ?? 0,
+          isLoadingAccount: snapshot.connectionState == ConnectionState.waiting,
         );
       },
     );
@@ -130,12 +131,14 @@ class _LocationsView extends StatelessWidget {
   const _LocationsView({
     required this.walletAddress,
     required this.weekXp,
+    required this.isLoadingAccount,
     this.profileName,
   });
 
   final String walletAddress;
   final String? profileName;
   final num weekXp;
+  final bool isLoadingAccount;
 
   @override
   Widget build(BuildContext context) {
@@ -152,6 +155,7 @@ class _LocationsView extends StatelessWidget {
               walletAddress: walletAddress,
               profileName: profileName,
               weekXp: weekXp,
+              isLoadingAccount: isLoadingAccount,
             ),
             const SizedBox(height: 16),
             Text(
@@ -268,12 +272,14 @@ class _PlayerTopBar extends StatelessWidget {
   const _PlayerTopBar({
     required this.walletAddress,
     required this.weekXp,
+    required this.isLoadingAccount,
     this.profileName,
   });
 
   final String walletAddress;
   final String? profileName;
   final num weekXp;
+  final bool isLoadingAccount;
 
   Future<void> _showProfileSheet(BuildContext context) {
     unawaited(context.read<RushAnalytics>().logProfileOpened());
@@ -323,13 +329,16 @@ class _PlayerTopBar extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _XpAmountText(
-                  amount: formatXp(weekXp.toDouble()),
-                  style: textTheme.titleMedium?.copyWith(
-                    color: tokens.foreground,
-                    fontWeight: AppFontWeights.semibold,
+                if (isLoadingAccount)
+                  const _XpAmountLoadingShimmer()
+                else
+                  Text(
+                    formatXp(weekXp.toDouble()),
+                    style: textTheme.titleMedium?.copyWith(
+                      color: tokens.foreground,
+                      fontWeight: AppFontWeights.semibold,
+                    ),
                   ),
-                ),
                 const SizedBox(width: 4),
                 const XpIcon(size: 18),
               ],
@@ -341,20 +350,15 @@ class _PlayerTopBar extends StatelessWidget {
   }
 }
 
-class _XpAmountText extends StatefulWidget {
-  const _XpAmountText({
-    required this.amount,
-    required this.style,
-  });
-
-  final String amount;
-  final TextStyle? style;
+class _XpAmountLoadingShimmer extends StatefulWidget {
+  const _XpAmountLoadingShimmer();
 
   @override
-  State<_XpAmountText> createState() => _XpAmountTextState();
+  State<_XpAmountLoadingShimmer> createState() =>
+      _XpAmountLoadingShimmerState();
 }
 
-class _XpAmountTextState extends State<_XpAmountText>
+class _XpAmountLoadingShimmerState extends State<_XpAmountLoadingShimmer>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
@@ -375,20 +379,21 @@ class _XpAmountTextState extends State<_XpAmountText>
 
   @override
   Widget build(BuildContext context) {
+    final tokens = context.appTheme;
+
     if (MediaQuery.disableAnimationsOf(context)) {
-      return Text(widget.amount, style: widget.style);
+      return _XpAmountLoadingBlock(color: tokens.muted);
     }
 
-    final tokens = context.appTheme;
-    final baseColor = widget.style?.color ?? tokens.foreground;
-    final highlightColor = Color.lerp(baseColor, tokens.accentDark, 0.8)!;
+    final baseColor = tokens.muted;
+    final highlightColor = Color.lerp(baseColor, tokens.accent, 0.3)!;
 
     return AnimatedBuilder(
       animation: _controller,
-      child: Text(widget.amount, style: widget.style),
+      child: _XpAmountLoadingBlock(color: baseColor),
       builder: (context, child) {
         return ShaderMask(
-          blendMode: BlendMode.srcIn,
+          blendMode: BlendMode.srcATop,
           shaderCallback: (bounds) {
             final shimmerOffset = bounds.width * (_controller.value * 2 - 1);
             return LinearGradient(
@@ -403,6 +408,23 @@ class _XpAmountTextState extends State<_XpAmountText>
           child: child,
         );
       },
+    );
+  }
+}
+
+class _XpAmountLoadingBlock extends StatelessWidget {
+  const _XpAmountLoadingBlock({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: const SizedBox(width: 44, height: 16),
     );
   }
 }
