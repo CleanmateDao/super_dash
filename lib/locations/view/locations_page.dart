@@ -41,10 +41,8 @@ class _LocationsPageState extends State<LocationsPage> {
   void initState() {
     super.initState();
     _accountFuture = _loadAccount();
-    _xpSubscription = context
-        .read<RushRealtimeService>()
-        .xpUpdates
-        .listen(_handleXpUpdated);
+    _xpSubscription =
+        context.read<RushRealtimeService>().xpUpdates.listen(_handleXpUpdated);
   }
 
   @override
@@ -148,98 +146,103 @@ class _LocationsView extends StatelessWidget {
       body: ResponsivePage(
         maxWidth: ResponsiveInsets.wideContentMaxWidth(context),
         child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _PlayerTopBar(
-                walletAddress: walletAddress,
-                profileName: profileName,
-                weekXp: weekXp,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _PlayerTopBar(
+              walletAddress: walletAddress,
+              profileName: profileName,
+              weekXp: weekXp,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Locations',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: tokens.foreground,
               ),
-              const SizedBox(height: 16),
-              Text(
-                'Locations',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: tokens.foreground,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return GridView.count(
-                      crossAxisCount: ResponsiveInsets.gridCrossAxisCount(
-                        context,
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return GridView.count(
+                    crossAxisCount: ResponsiveInsets.gridCrossAxisCount(
+                      context,
+                    ),
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio:
+                        ResponsiveInsets.gridChildAspectRatio(context),
+                    children: [
+                      _LocationCard(
+                        name: 'Antarctica',
+                        requirement: LocationRequirement.none,
+                        unlocked: true,
+                        image: const AssetImage('assets/images/antarctica.png'),
+                        onTap: () {
+                          unawaited(
+                            context.read<RushAnalytics>().logLocationSelected(
+                                  locationName: 'Antarctica',
+                                  unlocked: true,
+                                ),
+                          );
+                          Navigator.of(context).push(Game.route());
+                        },
                       ),
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      childAspectRatio:
-                          ResponsiveInsets.gridChildAspectRatio(context),
-                  children: [
-                    _LocationCard(
-                      name: 'Antarctica',
-                      requirement: LocationRequirement.none,
-                      unlocked: true,
-                      image: const AssetImage('assets/images/antarctica.png'),
-                      onTap: () {
-                        unawaited(
-                          context.read<RushAnalytics>().logLocationSelected(
-                                locationName: 'Antarctica',
-                                unlocked: true,
-                              ),
-                        );
-                        Navigator.of(context).push(Game.route());
-                      },
-                    ),
-                    const _LocationCard(
-                      name: 'Africa',
-                      requirement: LocationRequirement(xp: 100),
-                      image: AssetImage('assets/images/africa.png'),
-                    ),
-                    const _LocationCard(
-                      name: 'Asia',
-                      requirement: LocationRequirement(xp: 100, tier: 4),
-                      image: AssetImage('assets/images/asia.png'),
-                    ),
-                    const _LocationCard(
-                      name: 'Europe',
-                      requirement: LocationRequirement(
-                        xp: 40,
-                        tier: 4,
-                        squirrelNft: 1,
+                      const _LocationCard(
+                        name: 'Africa',
+                        requirement: LocationRequirement(
+                            xp: 100, tier: 4, squirrelNft: 1),
+                        image: AssetImage('assets/images/africa.png'),
                       ),
-                      image: AssetImage('assets/images/europe.png'),
-                    ),
-                    const _LocationCard(
-                      name: 'North America',
-                      requirement: LocationRequirement(xp: 100, tier: 4),
-                      image: AssetImage('assets/images/north_america.png'),
-                    ),
-                    const _LocationCard(
-                      name: 'South America',
-                      requirement: LocationRequirement(xp: 100, tier: 4),
-                      image: AssetImage('assets/images/south_america.png'),
-                    ),
-                    const _LocationCard(
-                      name: 'Australia',
-                      requirement: LocationRequirement(xp: 100, tier: 4),
-                      image: AssetImage('assets/images/australia.png'),
-                    ),
-                  ],
-                    );
-                  },
-                ),
+                      const _LocationCard(
+                        name: 'Asia',
+                        requirement: LocationRequirement(
+                            xp: 100, tier: 6, squirrelNft: 1),
+                        image: AssetImage('assets/images/asia.png'),
+                      ),
+                      const _LocationCard(
+                        name: 'Europe',
+                        requirement: LocationRequirement(
+                          xp: 120,
+                          tier: 6,
+                          squirrelNft: 1,
+                        ),
+                        image: AssetImage('assets/images/europe.png'),
+                      ),
+                      const _LocationCard(
+                        name: 'North America',
+                        requirement: LocationRequirement(
+                            xp: 100, tier: 4, squirrelNft: 1),
+                        image: AssetImage('assets/images/north_america.png'),
+                      ),
+                      const _LocationCard(
+                        name: 'South America',
+                        requirement: LocationRequirement(
+                            xp: 150, tier: 15, squirrelNft: 1),
+                        image: AssetImage('assets/images/south_america.png'),
+                      ),
+                      const _LocationCard(
+                        name: 'Australia',
+                        requirement: LocationRequirement(
+                            xp: 200, tier: 10, squirrelNft: 1),
+                        image: AssetImage('assets/images/australia.png'),
+                      ),
+                    ],
+                  );
+                },
               ),
-              const SizedBox(height: 12),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  AudioButton(),
-                  LeaderboardButton(),
-                  InfoButton(),
-                  HowToPlayButton(),
-                ],
-              ),
-            ],
+            ),
+            const SizedBox(height: 12),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                AudioButton(),
+                LeaderboardButton(),
+                InfoButton(),
+                HowToPlayButton(),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -503,10 +506,10 @@ class _LocationCard extends StatelessWidget {
                       const Spacer(),
                       Text(
                         name,
-                  style: textTheme.titleLarge?.copyWith(
-                    color: Colors.white,
-                    fontWeight: AppFontWeights.semibold,
-                  ),
+                        style: textTheme.titleLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: AppFontWeights.semibold,
+                        ),
                       ),
                       const SizedBox(height: 6),
                       _RequirementLabel(

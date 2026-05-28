@@ -27,6 +27,8 @@ class App extends StatelessWidget {
   final SettingsController settingsController;
   final LeaderboardRepository leaderboardRepository;
   final NetworkCache networkCache;
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +76,8 @@ class App extends StatelessWidget {
           ),
         ],
         child: MaterialApp(
+          navigatorKey: _navigatorKey,
+          scaffoldMessengerKey: _scaffoldMessengerKey,
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
           supportedLocales: AppLocalizations.supportedLocales,
@@ -83,6 +87,8 @@ class App extends StatelessWidget {
           ],
           builder: (context, child) => _RushSessionInvalidationListener(
             rushAnalytics: rushAnalytics,
+            navigatorKey: _navigatorKey,
+            scaffoldMessengerKey: _scaffoldMessengerKey,
             child: child ?? const SizedBox.shrink(),
           ),
           home: const GameIntroPage(),
@@ -95,10 +101,14 @@ class App extends StatelessWidget {
 class _RushSessionInvalidationListener extends StatefulWidget {
   const _RushSessionInvalidationListener({
     required this.rushAnalytics,
+    required this.navigatorKey,
+    required this.scaffoldMessengerKey,
     required this.child,
   });
 
   final RushAnalytics rushAnalytics;
+  final GlobalKey<NavigatorState> navigatorKey;
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
   final Widget child;
 
   @override
@@ -135,9 +145,14 @@ class _RushSessionInvalidationListenerState
       return;
     }
     unawaited(widget.rushAnalytics.logSessionDisconnected());
-    final navigator = Navigator.maybeOf(context);
-    navigator?.popUntil((route) => route.isFirst);
-    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+    widget.navigatorKey.currentState?.pushAndRemoveUntil<void>(
+      PageRouteBuilder(
+        settings: const RouteSettings(name: RushAnalyticsScreen.intro),
+        pageBuilder: (_, __, ___) => const GameIntroPage(),
+      ),
+      (_) => false,
+    );
+    widget.scaffoldMessengerKey.currentState?.showSnackBar(
       const SnackBar(
         content: Text('Cleanmate Rush was disconnected. Link again to play.'),
       ),

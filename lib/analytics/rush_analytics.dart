@@ -48,18 +48,18 @@ class RushAnalytics {
   RushAnalytics({
     FirebaseAnalytics? analytics,
     bool enabled = true,
-  })  : _analytics = analytics ?? FirebaseAnalytics.instance,
+  })  : _analytics = enabled ? analytics ?? FirebaseAnalytics.instance : null,
         _enabled = enabled;
 
   factory RushAnalytics.noop() => RushAnalytics(enabled: false);
 
-  final FirebaseAnalytics _analytics;
+  final FirebaseAnalytics? _analytics;
   final bool _enabled;
 
   Future<void> logScreenView(String screenName) async {
     if (!_enabled) return;
     final name = _clip(screenName, 100);
-    await _analytics.logScreenView(
+    await _analytics!.logScreenView(
       screenName: name,
       screenClass: name,
     );
@@ -150,8 +150,7 @@ class RushAnalytics {
 
   Future<void> logInfoOpened() => _log(RushAnalyticsEvent.infoOpened);
 
-  Future<void> logHowToPlayOpened() =>
-      _log(RushAnalyticsEvent.howToPlayOpened);
+  Future<void> logHowToPlayOpened() => _log(RushAnalyticsEvent.howToPlayOpened);
 
   Future<void> logAudioToggled({required bool muted}) => _log(
         RushAnalyticsEvent.audioToggled,
@@ -175,7 +174,7 @@ class RushAnalytics {
     Map<String, Object?>? params,
   ]) async {
     if (!_enabled) return;
-    await _analytics.logEvent(
+    await _analytics!.logEvent(
       name: name,
       parameters: _sanitize(params),
     );
