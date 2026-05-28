@@ -79,14 +79,14 @@ class LeaderboardView extends StatelessWidget {
         child: ResponsivePage(
           scrollable: true,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(
                 height: switch (context.screenLayout) {
-                  ScreenLayout.compact => 40,
-                  ScreenLayout.medium => 56,
-                  _ => MediaQuery.sizeOf(context).height * 0.10,
+                  ScreenLayout.compact => 72,
+                  ScreenLayout.medium => 96,
+                  _ => MediaQuery.sizeOf(context).height * 0.16,
                 },
               ),
               const Leaderboard(),
