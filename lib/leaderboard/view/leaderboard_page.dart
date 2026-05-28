@@ -67,6 +67,11 @@ class LeaderboardView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final tokens = context.appTheme;
+    final contentMinHeight = (MediaQuery.sizeOf(context).height -
+            MediaQuery.paddingOf(context).vertical -
+            ResponsiveInsets.pageVertical(context) * 2)
+        .clamp(0, double.infinity)
+        .toDouble();
     return PageWithBackground(
       background: const GameBackground(),
       child: DecoratedBox(
@@ -78,49 +83,52 @@ class LeaderboardView extends StatelessWidget {
         ),
         child: ResponsivePage(
           scrollable: true,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(
-                height: switch (context.screenLayout) {
-                  ScreenLayout.compact => 72,
-                  ScreenLayout.medium => 96,
-                  _ => MediaQuery.sizeOf(context).height * 0.16,
-                },
-              ),
-              const Leaderboard(),
-              const SizedBox(height: 20),
-              Align(
-                child: switch (step) {
-                  LeaderboardStep.gameIntro => GameElevatedButton(
-                      label: l10n.leaderboardPageGoBackButton,
-                      onPressed: Navigator.of(context).pop,
-                      gradient: tokens.blueGradient,
-                    ),
-                  LeaderboardStep.gameScore => GameElevatedButton.icon(
-                      label: l10n.playAgain,
-                      icon: Icon(
-                        Icons.refresh_outlined,
-                        size: 16,
-                        color: tokens.primaryForeground,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: contentMinHeight),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  height: switch (context.screenLayout) {
+                    ScreenLayout.compact => 72,
+                    ScreenLayout.medium => 96,
+                    _ => MediaQuery.sizeOf(context).height * 0.16,
+                  },
+                ),
+                const Leaderboard(),
+                const SizedBox(height: 20),
+                Align(
+                  child: switch (step) {
+                    LeaderboardStep.gameIntro => GameElevatedButton(
+                        label: l10n.leaderboardPageGoBackButton,
+                        onPressed: Navigator.of(context).pop,
+                        gradient: tokens.blueGradient,
                       ),
-                      onPressed: () {
-                        unawaited(
-                          context.read<RushAnalytics>().logPlayAgain(
-                                source: 'leaderboard',
-                              ),
-                        );
-                        completePlayAgainFlow(context);
-                      },
-                      gradient: tokens.blueGradient,
-                    ),
-                },
-              ),
-              SizedBox(
-                height: ResponsiveInsets.pageVertical(context),
-              ),
-            ],
+                    LeaderboardStep.gameScore => GameElevatedButton.icon(
+                        label: l10n.playAgain,
+                        icon: Icon(
+                          Icons.refresh_outlined,
+                          size: 16,
+                          color: tokens.primaryForeground,
+                        ),
+                        onPressed: () {
+                          unawaited(
+                            context.read<RushAnalytics>().logPlayAgain(
+                                  source: 'leaderboard',
+                                ),
+                          );
+                          completePlayAgainFlow(context);
+                        },
+                        gradient: tokens.blueGradient,
+                      ),
+                  },
+                ),
+                SizedBox(
+                  height: ResponsiveInsets.pageVertical(context),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -313,8 +321,7 @@ class _LeaderboardPeriodHeader extends StatelessWidget {
       (LeaderboardBloc bloc) => bloc.state is LeaderboardLoading,
     );
     final canGoToPreviousWeek = weeksAgo > 0 && !isLoading;
-    final canGoToOlderWeek =
-        weeksAgo < leaderboardMaxWeeksAgo && !isLoading;
+    final canGoToOlderWeek = weeksAgo < leaderboardMaxWeeksAgo && !isLoading;
 
     return DecoratedBox(
       decoration: BoxDecoration(

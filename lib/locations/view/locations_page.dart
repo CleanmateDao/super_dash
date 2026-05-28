@@ -308,8 +308,8 @@ class _PlayerTopBar extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  formatXp(weekXp.toDouble()),
+                _XpAmountText(
+                  amount: formatXp(weekXp.toDouble()),
                   style: textTheme.titleMedium?.copyWith(
                     color: tokens.foreground,
                     fontWeight: AppFontWeights.semibold,
@@ -322,6 +322,72 @@ class _PlayerTopBar extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _XpAmountText extends StatefulWidget {
+  const _XpAmountText({
+    required this.amount,
+    required this.style,
+  });
+
+  final String amount;
+  final TextStyle? style;
+
+  @override
+  State<_XpAmountText> createState() => _XpAmountTextState();
+}
+
+class _XpAmountTextState extends State<_XpAmountText>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return Text(widget.amount, style: widget.style);
+    }
+
+    final tokens = context.appTheme;
+    final baseColor = widget.style?.color ?? tokens.foreground;
+    final highlightColor = Color.lerp(baseColor, tokens.accentDark, 0.8)!;
+
+    return AnimatedBuilder(
+      animation: _controller,
+      child: Text(widget.amount, style: widget.style),
+      builder: (context, child) {
+        return ShaderMask(
+          blendMode: BlendMode.srcIn,
+          shaderCallback: (bounds) {
+            final shimmerOffset = bounds.width * (_controller.value * 2 - 1);
+            return LinearGradient(
+              colors: [
+                baseColor,
+                highlightColor,
+                baseColor,
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ).createShader(bounds.shift(Offset(shimmerOffset, 0)));
+          },
+          child: child,
+        );
+      },
     );
   }
 }

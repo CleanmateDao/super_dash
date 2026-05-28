@@ -4,7 +4,7 @@ class WalletAvatar extends StatelessWidget {
   const WalletAvatar({
     required this.walletAddress,
     this.imageUrl,
-    this.size = 44,
+    this.size = 36,
     super.key,
   });
 
