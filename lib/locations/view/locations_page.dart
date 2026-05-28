@@ -195,7 +195,6 @@ class _LocationsView extends StatelessWidget {
                       const _LocationCard(
                         name: 'Africa',
                         requirement: LocationRequirement(
-                          xp: 100,
                           tier: 4,
                           squirrelNft: 1,
                         ),
@@ -204,7 +203,6 @@ class _LocationsView extends StatelessWidget {
                       const _LocationCard(
                         name: 'Asia',
                         requirement: LocationRequirement(
-                          xp: 100,
                           tier: 6,
                           squirrelNft: 1,
                         ),
@@ -213,7 +211,6 @@ class _LocationsView extends StatelessWidget {
                       const _LocationCard(
                         name: 'Europe',
                         requirement: LocationRequirement(
-                          xp: 120,
                           tier: 6,
                           squirrelNft: 1,
                         ),
@@ -222,7 +219,6 @@ class _LocationsView extends StatelessWidget {
                       const _LocationCard(
                         name: 'North America',
                         requirement: LocationRequirement(
-                          xp: 100,
                           tier: 4,
                           squirrelNft: 1,
                         ),
@@ -231,7 +227,6 @@ class _LocationsView extends StatelessWidget {
                       const _LocationCard(
                         name: 'South America',
                         requirement: LocationRequirement(
-                          xp: 150,
                           tier: 15,
                           squirrelNft: 1,
                         ),
@@ -240,7 +235,6 @@ class _LocationsView extends StatelessWidget {
                       const _LocationCard(
                         name: 'Australia',
                         requirement: LocationRequirement(
-                          xp: 200,
                           tier: 10,
                           squirrelNft: 1,
                         ),
@@ -755,10 +749,6 @@ class _UnlockRequirementTile extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (detail.showXpIcon) ...[
-                          const SizedBox(width: 4),
-                          const XpIcon(size: 16),
-                        ],
                       ],
                     ),
                     if (detail.description.isNotEmpty) ...[
@@ -797,15 +787,6 @@ class _RequirementLabel extends StatelessWidget {
     }
 
     final children = <Widget>[
-      if (requirement.xp != null)
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('${requirement.xp}', style: style),
-            const SizedBox(width: 3),
-            const XpIcon(size: 14),
-          ],
-        ),
       if (requirement.tier != null)
         Text('Tier x${requirement.tier}', style: style),
       if (requirement.squirrelNft != null)
@@ -828,29 +809,19 @@ class _RequirementLabel extends StatelessWidget {
 
 class LocationRequirement {
   const LocationRequirement({
-    this.xp,
     this.tier,
     this.squirrelNft,
   });
 
-  final int? xp;
   final int? tier;
   final int? squirrelNft;
 
   static const none = LocationRequirement();
 
-  bool get isEmpty => xp == null && tier == null && squirrelNft == null;
+  bool get isEmpty => tier == null && squirrelNft == null;
 
   List<UnlockRequirementDetail> get unlockDetails {
     return [
-      if (xp != null)
-        UnlockRequirementDetail(
-          icon: Icons.bolt_outlined,
-          title: 'Earn at least $xp',
-          showXpIcon: true,
-          description: 'Collect trash and recyclables in unlocked locations '
-              'to build up your Cleanmate rewards.',
-        ),
       if (tier != null)
         UnlockRequirementDetail(
           icon: Icons.how_to_vote_outlined,
@@ -874,11 +845,9 @@ class UnlockRequirementDetail {
     required this.icon,
     required this.title,
     required this.description,
-    this.showXpIcon = false,
   });
 
   final IconData icon;
   final String title;
   final String description;
-  final bool showXpIcon;
 }

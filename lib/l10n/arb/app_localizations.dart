@@ -244,6 +244,12 @@ abstract class AppLocalizations {
   /// **'Back to locations'**
   String get backToLocations;
 
+  /// Text shown on the game over page to claim XP and return to locations
+  ///
+  /// In en, this message translates to:
+  /// **'Claim and quit game'**
+  String get claimAndQuitGame;
+
   /// Text shown in the game over page
   ///
   /// In en, this message translates to:
@@ -273,6 +279,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Play again'**
   String get playAgain;
+
+  /// Text shown on the game over page to claim XP and start another run
+  ///
+  /// In en, this message translates to:
+  /// **'Claim and play again'**
+  String get claimAndPlayAgain;
 
   /// Text shown on the game score label
   ///

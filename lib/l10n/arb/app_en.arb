@@ -100,6 +100,10 @@
     "@backToLocations": {
         "description": "Text shown on the game over page to return to locations"
     },
+    "claimAndQuitGame": "Claim and quit game",
+    "@claimAndQuitGame": {
+        "description": "Text shown on the game over page to claim XP and return to locations"
+    },
     "gameOver": "Game over!",
     "@gameOver": {
         "description": "Text shown in the game over page"
@@ -119,6 +123,10 @@
     "playAgain": "Play again",
     "@playAgain": {
         "description": "Text shown in the game over page"
+    },
+    "claimAndPlayAgain": "Claim and play again",
+    "@claimAndPlayAgain": {
+        "description": "Text shown on the game over page to claim XP and start another run"
     },
     "gameScoreLabel": "{points}",
     "@gameScoreLabel": {

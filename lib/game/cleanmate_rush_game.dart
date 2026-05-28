@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:app_ui/app_ui.dart';
 import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/audio/audio.dart';
 import 'package:cleanmate_rush/game/game.dart';
-import 'package:cleanmate_rush/user_session/user_session.dart';
 import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -15,14 +13,11 @@ import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leap/leap.dart';
 
 bool _tsxPackingFilter(Tileset tileset) {
   return !(tileset.source ?? '').startsWith('anim');
 }
-
-typedef GameplayXpPoster = Future<void> Function(double xp);
 
 Paint _layerPaintFactory(double opacity) {
   return Paint()
@@ -36,16 +31,8 @@ class CleanmateRushGame extends LeapGame
     required this.gameBloc,
     required this.audioController,
     RushAnalytics? rushAnalytics,
-    GameplayXpPoster? gameplayXpPoster,
-    UserSessionRepository? sessionRepository,
-    RushApiClient? apiClient,
-    RushRealtimeService? realtimeService,
     this.onRunEnded,
   })  : rushAnalytics = rushAnalytics ?? RushAnalytics.noop(),
-        _gameplayXpPoster = gameplayXpPoster,
-        _sessionRepository = sessionRepository,
-        _apiClient = apiClient,
-        _realtimeService = realtimeService,
         super(
           tileSize: 64,
           configuration: const LeapConfiguration(
@@ -76,17 +63,12 @@ class CleanmateRushGame extends LeapGame
   final GameBloc gameBloc;
   final AudioController audioController;
   final RushAnalytics rushAnalytics;
-  final GameplayXpPoster? _gameplayXpPoster;
-  final UserSessionRepository? _sessionRepository;
-  final RushApiClient? _apiClient;
-  final RushRealtimeService? _realtimeService;
   final void Function(double xp)? onRunEnded;
   final List<VoidCallback> _inputListener = [];
 
   late final SpriteSheet itemsSpritesheet;
 
   var _hasEndedRun = false;
-  var _hasAwardedRunXp = false;
   var _loggedFirstInput = false;
   var _isAdvancingSection = false;
   Completer<void>? _gameOverCompleter;
@@ -245,8 +227,6 @@ class CleanmateRushGame extends LeapGame
       pauseEngine();
       overlays.remove('tapToJump');
 
-      await _awardRunXp(xp);
-
       gameBloc.add(const GameOver());
 
       _clearWorldRunActors();
@@ -293,11 +273,10 @@ class CleanmateRushGame extends LeapGame
     overlays.add('tapToJump');
     resumeEngine();
     _hasEndedRun = false;
-    _hasAwardedRunXp = false;
     _loggedFirstInput = false;
   }
 
-  /// Ends the run early when the player leaves gameplay and awards earned XP.
+  /// Ends the run early when the player leaves gameplay.
   Future<void> quitRun() async {
     if (_hasEndedRun) {
       return;
@@ -307,69 +286,7 @@ class CleanmateRushGame extends LeapGame
     pauseEngine();
     overlays.remove('tapToJump');
 
-    final xp = gameBloc.state.xp;
-    await _awardRunXp(xp);
     gameBloc.add(const GameOver());
-  }
-
-  Future<void> _awardRunXp(double xp) async {
-    if (_hasAwardedRunXp || xp <= 0) {
-      return;
-    }
-
-    _hasAwardedRunXp = true;
-    final xpPoster = _gameplayXpPoster ?? _postGameplayXp;
-    await xpPoster(xp);
-  }
-
-  Future<void> _postGameplayXp(double xp) async {
-    if (xp <= 0) {
-      return;
-    }
-    var sessionRepository = _sessionRepository;
-    var apiClient = _apiClient;
-    var realtimeService = _realtimeService;
-    if (sessionRepository == null ||
-        apiClient == null ||
-        realtimeService == null) {
-      final context = buildContext;
-      if (context == null) {
-        return;
-      }
-      sessionRepository ??= context.read<UserSessionRepository>();
-      apiClient ??= context.read<RushApiClient>();
-      realtimeService ??= context.read<RushRealtimeService>();
-    }
-    final session = await sessionRepository.readSession();
-    if (session == null) {
-      return;
-    }
-    try {
-      final result = await apiClient.postGameplayXp(
-        token: session.token,
-        amount: xp,
-        runId: _newRunId(xp),
-      );
-      realtimeService.notifyXpAwarded(result);
-      unawaited(rushAnalytics.logXpPosted(xp: xp));
-    } on RushApiException catch (error) {
-      unawaited(
-        rushAnalytics.logXpPostFailed(
-          xp: xp,
-          statusCode: error.statusCode,
-        ),
-      );
-      if (error.statusCode == 401 || error.statusCode == 403) {
-        await sessionRepository.clearSession();
-      }
-    } on Exception {
-      unawaited(rushAnalytics.logXpPostFailed(xp: xp));
-    }
-  }
-
-  String _newRunId(double xp) {
-    final randomPart = Random().nextInt(1 << 32).toRadixString(16);
-    return '${DateTime.now().microsecondsSinceEpoch}-$xp-$randomPart';
   }
 
   void _resetEntities() {

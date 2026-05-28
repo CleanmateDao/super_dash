@@ -93,6 +93,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backToLocations => 'Back to locations';
 
   @override
+  String get claimAndQuitGame => 'Claim and quit game';
+
+  @override
   String get gameOver => 'Game over!';
 
   @override
@@ -106,6 +109,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playAgain => 'Play again';
+
+  @override
+  String get claimAndPlayAgain => 'Claim and play again';
 
   @override
   String gameScoreLabel(int points) {

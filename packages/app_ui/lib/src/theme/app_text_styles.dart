@@ -135,11 +135,11 @@ class AppTextStyles {
 /// Font weights aligned with Tailwind / the Cleanmate React app.
 abstract final class AppFontWeights {
   /// `font-medium` (500)
-  static const FontWeight medium = FontWeight.w500;
+  static const FontWeight medium = FontWeight.w400;
 
   /// `font-semibold` (600)
-  static const FontWeight semibold = FontWeight.w600;
+  static const FontWeight semibold = FontWeight.w500;
 
   /// `font-bold` (700)
-  static const FontWeight bold = FontWeight.w700;
+  static const FontWeight bold = FontWeight.w600;
 }
