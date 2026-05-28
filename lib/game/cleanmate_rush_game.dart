@@ -37,9 +37,15 @@ class CleanmateRushGame extends LeapGame
     required this.audioController,
     RushAnalytics? rushAnalytics,
     GameplayXpPoster? gameplayXpPoster,
+    UserSessionRepository? sessionRepository,
+    RushApiClient? apiClient,
+    RushRealtimeService? realtimeService,
     this.onRunEnded,
   })  : rushAnalytics = rushAnalytics ?? RushAnalytics.noop(),
         _gameplayXpPoster = gameplayXpPoster,
+        _sessionRepository = sessionRepository,
+        _apiClient = apiClient,
+        _realtimeService = realtimeService,
         super(
           tileSize: 64,
           configuration: const LeapConfiguration(
@@ -71,6 +77,9 @@ class CleanmateRushGame extends LeapGame
   final AudioController audioController;
   final RushAnalytics rushAnalytics;
   final GameplayXpPoster? _gameplayXpPoster;
+  final UserSessionRepository? _sessionRepository;
+  final RushApiClient? _apiClient;
+  final RushRealtimeService? _realtimeService;
   final void Function(double xp)? onRunEnded;
   final List<VoidCallback> _inputListener = [];
 
@@ -314,13 +323,23 @@ class CleanmateRushGame extends LeapGame
   }
 
   Future<void> _postGameplayXp(double xp) async {
-    if (xp <= 0 || buildContext == null) {
+    if (xp <= 0) {
       return;
     }
-    final context = buildContext!;
-    final sessionRepository = context.read<UserSessionRepository>();
-    final apiClient = context.read<RushApiClient>();
-    final realtimeService = context.read<RushRealtimeService>();
+    var sessionRepository = _sessionRepository;
+    var apiClient = _apiClient;
+    var realtimeService = _realtimeService;
+    if (sessionRepository == null ||
+        apiClient == null ||
+        realtimeService == null) {
+      final context = buildContext;
+      if (context == null) {
+        return;
+      }
+      sessionRepository ??= context.read<UserSessionRepository>();
+      apiClient ??= context.read<RushApiClient>();
+      realtimeService ??= context.read<RushRealtimeService>();
+    }
     final session = await sessionRepository.readSession();
     if (session == null) {
       return;

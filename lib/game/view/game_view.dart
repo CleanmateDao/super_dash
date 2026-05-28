@@ -6,6 +6,7 @@ import 'package:cleanmate_rush/audio/audio.dart';
 import 'package:cleanmate_rush/game/game.dart';
 import 'package:cleanmate_rush/game_intro/game_intro.dart';
 import 'package:cleanmate_rush/score/score.dart';
+import 'package:cleanmate_rush/user_session/user_session.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -136,6 +137,9 @@ class _GameViewState extends State<GameView> {
                   gameBloc: context.read<GameBloc>(),
                   audioController: context.read<AudioController>(),
                   rushAnalytics: context.read<RushAnalytics>(),
+                  sessionRepository: context.read<UserSessionRepository>(),
+                  apiClient: context.read<RushApiClient>(),
+                  realtimeService: context.read<RushRealtimeService>(),
                   onRunEnded: _showGameEndScreen,
                 );
                 _game = game;
