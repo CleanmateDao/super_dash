@@ -63,11 +63,7 @@ class _GameViewState extends State<GameView> {
         switch (result) {
           case ScoreFlowResult.playAgain:
             unawaited(analytics.logPlayAgain(source: 'score_flow'));
-            // Start a completely fresh game run by replacing the current
-            // game route with a new one. This guarantees the level, XP and
-            // world state are reset, avoiding any lingering "end of run"
-            // state from the previous session.
-            Navigator.of(context).pushReplacement(Game.route());
+            _restartGameAfterScoreFlow();
           case ScoreFlowResult.backToLocations:
             Navigator.of(context, rootNavigator: true).pop();
           case ScoreFlowResult.dismissed:
@@ -88,7 +84,21 @@ class _GameViewState extends State<GameView> {
   void dispose() {
     _lifecycleNotifier?.removeListener(_handleLifecycleChanged);
     _lifecycleNotifier = null;
+    _game = null;
     super.dispose();
+  }
+
+  void _restartGameAfterScoreFlow() {
+    final navigator = Navigator.of(context, rootNavigator: true);
+    _game = null;
+
+    // Wait until the score route has finished popping before replacing game.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      navigator.pushReplacement(Game.route());
+    });
   }
 
   void _handleLifecycleChanged() {

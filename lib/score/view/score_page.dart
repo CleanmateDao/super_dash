@@ -5,17 +5,15 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// Completes the score flow and signals [GameView] to restart the run.
+/// Pops the score route and signals [GameView] to restart the run.
 void completePlayAgainFlow(BuildContext context) {
-  context.flow<ScoreState>().complete(
-    (state) => state.copyWith(playAgainRequested: true),
-  );
+  Navigator.of(context, rootNavigator: true).pop(ScoreFlowResult.playAgain);
 }
 
-/// Completes the score flow and returns the player to locations.
+/// Pops the score route and returns the player to locations.
 void completeBackToLocationsFlow(BuildContext context) {
-  context.flow<ScoreState>().complete(
-    (state) => state.copyWith(backToLocationsRequested: true),
+  Navigator.of(context, rootNavigator: true).pop(
+    ScoreFlowResult.backToLocations,
   );
 }
 
@@ -53,9 +51,7 @@ class ScoreView extends StatelessWidget {
     return FlowBuilder<ScoreState>(
       state: context.select((ScoreBloc bloc) => bloc.state),
       onGeneratePages: onGenerateScorePages,
-      onComplete: (state) {
-        Navigator.of(context, rootNavigator: true).pop(state.flowResult);
-      },
+      // Flow completion is handled by popping the score route from child pages.
     );
   }
 }

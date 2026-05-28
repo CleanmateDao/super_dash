@@ -171,6 +171,10 @@ class _GameOverPageState extends State<GameOverPage> {
       return;
     }
 
+    _finishScoreFlow(result);
+  }
+
+  void _finishScoreFlow(ScoreFlowResult result) {
     final analytics = context.read<RushAnalytics>();
     switch (result) {
       case ScoreFlowResult.playAgain:
