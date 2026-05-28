@@ -191,13 +191,19 @@ class _LocationsView extends StatelessWidget {
                       const _LocationCard(
                         name: 'Africa',
                         requirement: LocationRequirement(
-                            xp: 100, tier: 4, squirrelNft: 1),
+                          xp: 100,
+                          tier: 4,
+                          squirrelNft: 1,
+                        ),
                         image: AssetImage('assets/images/africa.png'),
                       ),
                       const _LocationCard(
                         name: 'Asia',
                         requirement: LocationRequirement(
-                            xp: 100, tier: 6, squirrelNft: 1),
+                          xp: 100,
+                          tier: 6,
+                          squirrelNft: 1,
+                        ),
                         image: AssetImage('assets/images/asia.png'),
                       ),
                       const _LocationCard(
@@ -212,19 +218,28 @@ class _LocationsView extends StatelessWidget {
                       const _LocationCard(
                         name: 'North America',
                         requirement: LocationRequirement(
-                            xp: 100, tier: 4, squirrelNft: 1),
+                          xp: 100,
+                          tier: 4,
+                          squirrelNft: 1,
+                        ),
                         image: AssetImage('assets/images/north_america.png'),
                       ),
                       const _LocationCard(
                         name: 'South America',
                         requirement: LocationRequirement(
-                            xp: 150, tier: 15, squirrelNft: 1),
+                          xp: 150,
+                          tier: 15,
+                          squirrelNft: 1,
+                        ),
                         image: AssetImage('assets/images/south_america.png'),
                       ),
                       const _LocationCard(
                         name: 'Australia',
                         requirement: LocationRequirement(
-                            xp: 200, tier: 10, squirrelNft: 1),
+                          xp: 200,
+                          tier: 10,
+                          squirrelNft: 1,
+                        ),
                         image: AssetImage('assets/images/australia.png'),
                       ),
                     ],
