@@ -13,7 +13,6 @@ class TreeSign extends TextComponent with HasGameRef<CleanmateRushGame> {
             style: const TextStyle(
               color: Color(0xffffffff),
               fontSize: 24,
-              fontFamily: 'Google Sans',
             ),
           ),
         );

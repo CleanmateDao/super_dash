@@ -3,7 +3,7 @@
 
 function hideSplash() {
   document.querySelector('#progress-bar')?.remove();
-  document.querySelector('#splash-logo')?.remove();
+  document.querySelector('#top-credit')?.remove();
   document.querySelector('#splash-copy')?.remove();
   document.body.classList.remove('loading-mode');
 }
