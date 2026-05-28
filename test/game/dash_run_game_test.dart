@@ -1,6 +1,9 @@
 // ignore_for_file: cascade_invocations
 
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
+import 'package:cleanmate_rush/analytics/analytics.dart';
 import 'package:cleanmate_rush/audio/audio.dart';
 import 'package:cleanmate_rush/game/game.dart';
 import 'package:flame/components.dart';
@@ -12,6 +15,8 @@ class _MockGameBloc extends MockBloc<GameEvent, GameState>
     implements GameBloc {}
 
 class _MockAudioController extends Mock implements AudioController {}
+
+class _MockRushAnalytics extends Mock implements RushAnalytics {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -27,10 +32,16 @@ void main() {
       when(() => gameBloc.state).thenReturn(const GameState.initial());
     });
 
-    CleanmateRushGame createGame() {
+    CleanmateRushGame createGame({
+      GameplayXpPoster? gameplayXpPoster,
+      void Function(double xp)? onRunEnded,
+    }) {
       return CleanmateRushGame(
         gameBloc: gameBloc,
         audioController: audioController,
+        rushAnalytics: _MockRushAnalytics(),
+        gameplayXpPoster: gameplayXpPoster,
+        onRunEnded: onRunEnded,
       );
     }
 
@@ -96,6 +107,55 @@ void main() {
       },
       timeout: const Timeout(Duration(minutes: 2)),
       skip: true, // TODO(all): This test is flaky, skipping it for now
+    );
+
+    test('posts earned xp when the run is quit', () async {
+      final postedXp = <double>[];
+      when(() => gameBloc.state).thenReturn(
+        const GameState.initial().copyWith(xp: 12.5),
+      );
+      final game = createGame(
+        gameplayXpPoster: (xp) async => postedXp.add(xp),
+      );
+
+      await game.quitRun();
+      await game.quitRun();
+
+      expect(postedXp, equals([12.5]));
+      verify(() => gameBloc.add(const GameOver())).called(1);
+    });
+
+    late Completer<void> xpPosted;
+    late List<double> endedRunPostedXp;
+
+    testWithGame(
+      'posts earned xp when the run ends',
+      () {
+        xpPosted = Completer<void>();
+        endedRunPostedXp = [];
+        when(() => gameBloc.state).thenReturn(
+          const GameState.initial().copyWith(xp: 7.25),
+        );
+        return createGame(
+          gameplayXpPoster: (xp) async {
+            endedRunPostedXp.add(xp);
+            xpPosted.complete();
+          },
+          onRunEnded: (_) {},
+        );
+      },
+      (game) async {
+        await game.ready();
+
+        game.gameOver();
+        game.gameOver();
+
+        await xpPosted.future.timeout(const Duration(seconds: 5));
+        await Future<void>.delayed(Duration.zero);
+        expect(endedRunPostedXp, equals([7.25]));
+        verify(() => gameBloc.add(const GameOver())).called(1);
+      },
+      timeout: const Timeout(Duration(minutes: 2)),
     );
   });
 }

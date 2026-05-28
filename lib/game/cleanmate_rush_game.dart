@@ -22,6 +22,8 @@ bool _tsxPackingFilter(Tileset tileset) {
   return !(tileset.source ?? '').startsWith('anim');
 }
 
+typedef GameplayXpPoster = Future<void> Function(double xp);
+
 Paint _layerPaintFactory(double opacity) {
   return Paint()
     ..color = Color.fromRGBO(255, 255, 255, opacity)
@@ -34,8 +36,10 @@ class CleanmateRushGame extends LeapGame
     required this.gameBloc,
     required this.audioController,
     RushAnalytics? rushAnalytics,
+    GameplayXpPoster? gameplayXpPoster,
     this.onRunEnded,
   })  : rushAnalytics = rushAnalytics ?? RushAnalytics.noop(),
+        _gameplayXpPoster = gameplayXpPoster,
         super(
           tileSize: 64,
           configuration: const LeapConfiguration(
@@ -66,6 +70,7 @@ class CleanmateRushGame extends LeapGame
   final GameBloc gameBloc;
   final AudioController audioController;
   final RushAnalytics rushAnalytics;
+  final GameplayXpPoster? _gameplayXpPoster;
   final void Function(double xp)? onRunEnded;
   final List<VoidCallback> _inputListener = [];
 
@@ -304,7 +309,8 @@ class CleanmateRushGame extends LeapGame
     }
 
     _hasAwardedRunXp = true;
-    await _postGameplayXp(xp);
+    final xpPoster = _gameplayXpPoster ?? _postGameplayXp;
+    await xpPoster(xp);
   }
 
   Future<void> _postGameplayXp(double xp) async {
